@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libraries\Budgets.Application\Budgets.Application.csproj" />
+    <ProjectReference Include="..\..\libraries\Budgets.Infrastructure.IoC\Budgets.Infrastructure.IoC.csproj" />
+    <ProjectReference Include="..\..\libraries\Budgets.Infrastructure\Budgets.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\libraries\Budgets.Shared\Budgets.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
