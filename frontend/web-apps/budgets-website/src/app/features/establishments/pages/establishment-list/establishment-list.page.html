@@ -1,0 +1,32 @@
+<section class="establishment-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Estabelecimentos'"
+    [summary]="establishmentCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyEstablishmentId()"
+    [emptyTitle]="'Nenhum estabelecimento cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro estabelecimento para liberar a operacao.'"
+    addLabel="Adicionar"
+    (add)="openCreateModal()"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteEstablishment($event)"
+  />
+
+  @if (modalState()) {
+    <app-establishment-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      (close)="closeModal()"
+      (submitForm)="saveEstablishment($event)"
+    />
+  }
+</section>

@@ -1,0 +1,37 @@
+<app-auth-shell
+  title="Confirme que e voce."
+  description="Sua conta esta protegida por autenticacao em duas etapas. Digite o codigo atual do aplicativo autenticador."
+  alternateLabel="Precisa voltar?"
+  alternateLink="/login"
+  alternateText="Retornar ao login"
+>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <header>
+      <h2>Codigo de verificacao</h2>
+      <p>Informe os 6 digitos exibidos no aplicativo autenticador.</p>
+    </header>
+
+    @if (noticeMessage()) {
+      <z-alert [zDescription]="noticeMessage() ?? ''" />
+    }
+
+    @if (errorMessage()) {
+      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
+    }
+
+    <label>
+      <span>Codigo</span>
+      <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" />
+      @if (hasCodeError('required')) {
+        <small>Informe o codigo.</small>
+      }
+      @if (hasCodeError('pattern')) {
+        <small>Use exatamente 6 digitos numericos.</small>
+      }
+    </label>
+
+    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
+      {{ submitting() ? 'Validando...' : 'Confirmar e entrar' }}
+    </button>
+  </form>
+</app-auth-shell>

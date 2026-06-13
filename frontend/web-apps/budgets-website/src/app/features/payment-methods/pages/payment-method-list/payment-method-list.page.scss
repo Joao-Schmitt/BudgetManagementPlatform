@@ -1,0 +1,24 @@
+.payment-method-page {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.feedback {
+  padding: 0.8rem 0.95rem;
+  border-radius: 0.95rem;
+  font-size: 0.82rem;
+}
+
+.feedback--error {
+  border: 1px solid rgba(214, 69, 69, 0.16);
+  background: rgba(214, 69, 69, 0.06);
+  color: #b83232;
+}
+
+@media (max-width: 920px) {
+  .payment-method-page {
+    padding-inline: 0.9rem;
+  }
+}
+
