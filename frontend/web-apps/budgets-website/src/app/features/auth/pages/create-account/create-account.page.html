@@ -1,0 +1,66 @@
+<app-auth-shell
+  title="Crie a base segura do seu workspace."
+  description="Abra sua conta, configure o acesso e prepare a autenticacao em duas etapas logo no primeiro uso."
+  alternateLabel="Ja tem conta?"
+  alternateLink="/login"
+  alternateText="Fazer login"
+>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <header>
+      <h2>Criar conta</h2>
+      <p>Preencha seus dados para iniciar o onboarding.</p>
+    </header>
+
+    @if (errorMessage()) {
+      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
+    }
+
+    <label>
+      <span>Nome</span>
+      <input z-input type="text" formControlName="name" placeholder="Seu nome completo" />
+      @if (hasError('name', 'required')) {
+        <small>Informe seu nome.</small>
+      }
+      @if (hasError('name', 'minlength')) {
+        <small>Use pelo menos 3 caracteres.</small>
+      }
+    </label>
+
+    <label>
+      <span>E-mail</span>
+      <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" />
+      @if (hasError('email', 'required')) {
+        <small>Informe o e-mail.</small>
+      }
+      @if (hasError('email', 'email')) {
+        <small>Digite um e-mail valido.</small>
+      }
+    </label>
+
+    <label>
+      <span>Senha</span>
+      <input z-input type="password" formControlName="password" placeholder="Crie uma senha" />
+      @if (hasError('password', 'required')) {
+        <small>Informe uma senha.</small>
+      }
+      @if (hasError('password', 'minlength')) {
+        <small>Use pelo menos 6 caracteres.</small>
+      }
+    </label>
+
+    <label>
+      <span>Confirmar senha</span>
+      <input z-input type="password" formControlName="confirmPassword" placeholder="Repita a senha" />
+      @if (hasError('confirmPassword', 'required')) {
+        <small>Confirme a senha.</small>
+      }
+      @if (passwordsDoNotMatch()) {
+        <small>As senhas devem ser iguais.</small>
+      }
+    </label>
+
+    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
+      {{ submitting() ? 'Criando conta...' : 'Criar conta' }}
+    </button>
+  </form>
+</app-auth-shell>

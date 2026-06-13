@@ -1,0 +1,69 @@
+<section class="dashboard-grid">
+  <div class="dashboard-grid__summary">
+    @for (card of summaryCards; track card.label) {
+      <z-card class="metric-tile" [class.metric-tile--highlight]="card.tone === 'highlight'">
+        <p>{{ card.label }}</p>
+        <strong>{{ card.value }}</strong>
+        <span>{{ card.trend }}</span>
+      </z-card>
+    }
+  </div>
+
+  <z-card class="panel">
+    <div class="panel__header">
+      <div>
+        <p class="panel__eyebrow">Operacao</p>
+        <h2>Atalhos rapidos</h2>
+      </div>
+      <span class="panel__hint">Fluxos frequentes</span>
+    </div>
+
+    <div class="action-tiles">
+      @for (action of quickActions; track action.title) {
+        <button type="button" z-button [zType]="quickActionType(action.tone)" class="action-tile">
+          <strong>{{ action.title }}</strong>
+          <span>{{ action.description }}</span>
+        </button>
+      }
+    </div>
+  </z-card>
+
+  <z-card class="panel">
+    <div class="panel__header">
+      <div>
+        <p class="panel__eyebrow">Monitoramento</p>
+        <h2>Ultimos orcamentos</h2>
+      </div>
+      <span class="panel__hint">Atualizado em tempo real</span>
+    </div>
+
+    <div class="table-wrapper">
+      <table z-table zSize="compact">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Codigo</th>
+            <th z-table-head>Cliente</th>
+            <th z-table-head>Responsavel</th>
+            <th z-table-head>Valor</th>
+            <th z-table-head>Status</th>
+            <th z-table-head>Atualizacao</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @for (budget of recentBudgets; track budget.code) {
+            <tr z-table-row>
+              <td z-table-cell>{{ budget.code }}</td>
+              <td z-table-cell>{{ budget.client }}</td>
+              <td z-table-cell>{{ budget.owner }}</td>
+              <td z-table-cell>{{ budget.amount }}</td>
+              <td z-table-cell>
+                <z-badge [zType]="statusType(budget.status)">{{ budget.status }}</z-badge>
+              </td>
+              <td z-table-cell>{{ budget.updatedAt }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </z-card>
+</section>

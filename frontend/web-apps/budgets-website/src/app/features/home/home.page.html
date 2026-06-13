@@ -1,0 +1,117 @@
+<div class="workspace-shell" [class.drawer-open]="drawerOpen()">
+  @if (userMenuOpen()) {
+    <button
+      type="button"
+      class="overlay-close"
+      (click)="closeUserMenu()"
+      aria-label="Fechar menu do usuario"
+    ></button>
+  }
+
+  <button
+    type="button"
+    class="drawer-backdrop"
+    [class.visible]="drawerOpen()"
+    (click)="closeDrawer()"
+    aria-label="Fechar menu lateral"
+  ></button>
+
+  <aside class="sidebar">
+    <div class="sidebar__top">
+      <a class="brand" [routerLink]="'/home/overview'" aria-label="Budgets">
+        <span class="brand__mark">B</span>
+        <span class="brand__copy">
+          <strong>Budgets</strong>
+          <small>ERP financeiro comercial</small>
+        </span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav" aria-label="Menu principal">
+      @for (item of navigationItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="is-active"
+          class="sidebar__link"
+          (click)="closeDrawer()"
+          [attr.aria-label]="item.label"
+          [attr.title]="null"
+        >
+          <span class="sidebar__icon" aria-hidden="true">
+            <ng-icon [name]="item.icon" class="size-4" />
+          </span>
+
+          <span class="sidebar__label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <main class="workspace">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button type="button" z-button zType="outline" zSize="icon" class="menu-toggle" (click)="toggleDrawer()" aria-label="Abrir menu lateral">
+          <ng-icon name="lucideMenu" class="size-4" aria-hidden="true" />
+        </button>
+
+        <div class="page-meta">
+          <p class="breadcrumb" aria-label="Breadcrumb">
+            @for (item of breadcrumbItems(); track item; let isLast = $last) {
+              <span [class.current]="isLast">{{ item }}</span>
+              @if (!isLast) {
+                <span class="separator">/</span>
+              }
+            }
+          </p>
+
+          <div class="page-headline">
+            <h1>{{ currentSectionTitle() }}</h1>
+            <p>{{ currentSectionDescription() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <button
+          type="button"
+          class="user-button"
+          (click)="toggleUserMenu()"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="userMenuOpen()"
+        >
+          <z-avatar
+            class="user-button__avatar"
+            [zFallback]="authState.currentUser()?.name?.charAt(0) || 'U'"
+            zShape="square"
+            aria-hidden="true"
+          />
+          <span class="user-button__meta">
+            <strong>{{ authState.currentUser()?.name }}</strong>
+            <small>Administrador</small>
+          </span>
+          <ng-icon name="lucideChevronDown" class="size-4" aria-hidden="true" />
+        </button>
+
+        @if (userMenuOpen()) {
+          <div class="user-menu" role="menu">
+            <div class="user-menu__header">
+              <strong>{{ authState.currentUser()?.name }}</strong>
+              <span>{{ authState.currentUser()?.email }}</span>
+            </div>
+
+            <z-divider class="my-1" />
+
+            <button type="button" z-button zType="ghost" zFull class="justify-start text-destructive hover:text-destructive" (click)="logout()">
+              <ng-icon name="lucideLogOut" class="size-4" aria-hidden="true" />
+              Sair
+            </button>
+          </div>
+        }
+      </div>
+    </header>
+
+    <section class="workspace-content">
+      <router-outlet />
+    </section>
+  </main>
+</div>

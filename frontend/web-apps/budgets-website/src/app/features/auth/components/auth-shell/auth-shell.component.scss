@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+
+.auth-shell {
+  min-height: 100vh;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 460px) minmax(320px, 440px);
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--background);
+}
+
+.brand-panel {
+  justify-self: end;
+  max-width: 30rem;
+  color: var(--foreground);
+}
+
+.eyebrow {
+  margin: 0 0 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted-foreground);
+}
+
+h1 {
+  max-width: 34rem;
+  margin: 0;
+  font-size: clamp(2.1rem, 4vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.description {
+  margin: 1.25rem 0 0;
+  max-width: 34rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+
+.alternate {
+  margin-top: 1.2rem;
+  color: var(--muted-foreground);
+}
+
+.alternate a {
+  color: var(--foreground);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.auth-card {
+  justify-self: start;
+  width: min(100%, 440px);
+  box-shadow: 0 18px 48px oklch(0.145 0 0 / 8%);
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+  }
+
+  .brand-panel,
+  .auth-card {
+    justify-self: stretch;
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -1,0 +1,18 @@
+<section class="auth-shell">
+  <div class="brand-panel">
+    <p class="eyebrow">{{ eyebrow() }}</p>
+    <h1>{{ title() }}</h1>
+    <p class="description">{{ description() }}</p>
+
+    @if (alternateLabel() && alternateLink() && alternateText()) {
+      <p class="alternate">
+        {{ alternateLabel() }}
+        <a [routerLink]="alternateLink()">{{ alternateText() }}</a>
+      </p>
+    }
+  </div>
+
+  <z-card class="auth-card">
+    <ng-content />
+  </z-card>
+</section>

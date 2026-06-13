@@ -1,0 +1,32 @@
+<section class="product-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Produtos'"
+    [summary]="productCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyProductId()"
+    [emptyTitle]="'Nenhum produto cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro produto para organizar o catalogo.'"
+    addLabel="Adicionar"
+    (add)="openCreateModal()"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteProduct($event)"
+  />
+
+  @if (modalState()) {
+    <app-product-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      (close)="closeModal()"
+      (submitForm)="saveProduct($event)"
+    />
+  }
+</section>

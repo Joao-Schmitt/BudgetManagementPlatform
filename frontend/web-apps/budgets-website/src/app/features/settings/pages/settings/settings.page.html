@@ -1,0 +1,233 @@
+<section class="settings-page">
+  <div class="settings-page__summary">
+    <z-card class="identity-card">
+      <div class="identity-card__avatar" aria-hidden="true">
+        {{ currentUser()?.name?.charAt(0) || 'U' }}
+      </div>
+
+      <div>
+        <z-badge zType="secondary">Conta conectada</z-badge>
+        <h2>{{ currentUser()?.name }}</h2>
+        <p>{{ currentUser()?.email }}</p>
+      </div>
+    </z-card>
+
+    <z-card class="security-note">
+      <ng-icon name="lucideShieldCheck" class="size-5" aria-hidden="true" />
+      <div>
+        <strong>Validacao sensivel pelo backend</strong>
+        <span>Alteracoes protegidas por 2FA so sao aceitas quando a API confirma o codigo atual.</span>
+      </div>
+    </z-card>
+  </div>
+
+  @if (successMessage()) {
+    <z-alert zTitle="Alteracao salva" [zDescription]="successMessage() ?? ''" />
+  }
+
+  <div class="settings-grid">
+    <z-card class="settings-card">
+      <header class="settings-card__header">
+        <span class="settings-card__icon" aria-hidden="true">
+          <ng-icon name="lucideUserRound" class="size-4" />
+        </span>
+        <div>
+          <h2>Alterar nome</h2>
+          <p>Atualize o nome exibido no workspace e na sessao atual.</p>
+        </div>
+      </header>
+
+      @if (nameError()) {
+        <z-alert zType="destructive" [zDescription]="nameError() ?? ''" />
+      }
+
+      <form class="settings-form" [formGroup]="nameForm" (ngSubmit)="saveName()">
+        <label class="field">
+          <span>Nome</span>
+          <input z-input type="text" formControlName="name" autocomplete="name" placeholder="Seu nome" />
+          @if (hasNameError('required')) {
+            <small>Informe seu nome.</small>
+          }
+          @if (hasNameError('maxlength')) {
+            <small>Use ate 120 caracteres.</small>
+          }
+        </label>
+
+        <button type="submit" z-button [zLoading]="savingName()" [disabled]="savingName()">
+          {{ savingName() ? 'Salvando...' : 'Salvar nome' }}
+        </button>
+      </form>
+    </z-card>
+
+    <z-card class="settings-card">
+      <header class="settings-card__header">
+        <span class="settings-card__icon" aria-hidden="true">
+          <ng-icon name="lucideMail" class="size-4" />
+        </span>
+        <div>
+          <h2>Alterar e-mail</h2>
+          <p>Se sua conta usa 2FA, a API exigira o codigo do autenticador.</p>
+        </div>
+      </header>
+
+      @if (emailError()) {
+        <z-alert zType="destructive" [zDescription]="emailError() ?? ''" />
+      }
+
+      <form class="settings-form" [formGroup]="emailForm" (ngSubmit)="saveEmail()">
+        <label class="field">
+          <span>E-mail</span>
+          <input z-input type="email" formControlName="email" autocomplete="email" placeholder="voce@empresa.com" />
+          @if (hasEmailError('required')) {
+            <small>Informe o e-mail.</small>
+          }
+          @if (hasEmailError('email')) {
+            <small>Digite um e-mail valido.</small>
+          }
+          @if (hasEmailError('maxlength')) {
+            <small>Use ate 180 caracteres.</small>
+          }
+        </label>
+
+        <button type="submit" z-button [zLoading]="savingEmail()" [disabled]="savingEmail()">
+          {{ savingEmail() ? 'Salvando...' : 'Salvar e-mail' }}
+        </button>
+      </form>
+    </z-card>
+
+    <z-card class="settings-card settings-card--wide">
+      <header class="settings-card__header">
+        <span class="settings-card__icon" aria-hidden="true">
+          <ng-icon name="lucideLockKeyhole" class="size-4" />
+        </span>
+        <div>
+          <h2>Alterar senha</h2>
+          <p>Confirme sua senha atual antes de definir uma nova credencial.</p>
+        </div>
+      </header>
+
+      @if (passwordError()) {
+        <z-alert zType="destructive" [zDescription]="passwordError() ?? ''" />
+      }
+
+      <form class="settings-form settings-form--password" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+        <label class="field">
+          <span>Senha atual</span>
+          <input z-input type="password" formControlName="currentPassword" autocomplete="current-password" />
+          @if (hasPasswordError('currentPassword', 'required')) {
+            <small>Informe sua senha atual.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Nova senha</span>
+          <input z-input type="password" formControlName="newPassword" autocomplete="new-password" />
+          @if (hasPasswordError('newPassword', 'required')) {
+            <small>Informe a nova senha.</small>
+          }
+          @if (hasPasswordError('newPassword', 'minlength')) {
+            <small>Use pelo menos 6 caracteres.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Confirmar nova senha</span>
+          <input z-input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          @if (hasPasswordError('confirmPassword', 'required')) {
+            <small>Confirme a nova senha.</small>
+          }
+          @if (hasPasswordError('confirmPassword', 'mismatch')) {
+            <small>As senhas nao conferem.</small>
+          }
+        </label>
+
+        <button type="submit" z-button [zLoading]="savingPassword()" [disabled]="savingPassword()">
+          {{ savingPassword() ? 'Salvando...' : 'Salvar senha' }}
+        </button>
+      </form>
+    </z-card>
+
+    <z-card class="settings-card settings-card--wide">
+      <header class="settings-card__header settings-card__header--split">
+        <span class="settings-card__icon" aria-hidden="true">
+          <ng-icon name="lucideShieldCheck" class="size-4" />
+        </span>
+        <div>
+          <h2>Autenticacao de dois fatores</h2>
+          <p>Desative somente se tiver certeza. A API exige o codigo atual antes de aplicar a mudanca.</p>
+        </div>
+
+        <button
+          type="button"
+          class="switch-control"
+          role="switch"
+          [class.is-on]="isTwoFactorEnabled()"
+          [attr.aria-checked]="isTwoFactorEnabled()"
+          [disabled]="!isTwoFactorEnabled() || disablingTwoFactor()"
+          (click)="requestDisableTwoFactor()"
+        >
+          <span class="switch-control__track" aria-hidden="true">
+            <span class="switch-control__thumb"></span>
+          </span>
+          <span class="switch-control__label">
+            {{ isTwoFactorEnabled() ? 'Ativo' : 'Inativo' }}
+          </span>
+        </button>
+      </header>
+
+      @if (securityError()) {
+        <z-alert zType="destructive" [zDescription]="securityError() ?? ''" />
+      }
+    </z-card>
+  </div>
+
+  @if (pendingTwoFactorAction()) {
+    <div class="dialog-backdrop" role="presentation" (click)="closeTwoFactorDialog()">
+      <z-card
+        class="two-factor-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="two-factor-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="two-factor-dialog__header">
+          <div>
+            <z-badge zType="secondary">Autenticacao de dois fatores</z-badge>
+            <h2 id="two-factor-title">{{ twoFactorTitle() }}</h2>
+            <p>Informe o codigo atual do seu aplicativo autenticador para a API validar esta alteracao.</p>
+          </div>
+
+          <button type="button" z-button zType="ghost" zSize="icon" (click)="closeTwoFactorDialog()" aria-label="Fechar popup de 2FA">
+            <ng-icon name="lucideX" class="size-4" aria-hidden="true" />
+          </button>
+        </header>
+
+        @if (twoFactorError()) {
+          <z-alert zType="destructive" [zDescription]="twoFactorError() ?? ''" />
+        }
+
+        <form class="two-factor-form" [formGroup]="twoFactorForm" (ngSubmit)="submitTwoFactor()">
+          <label class="field">
+            <span>Codigo de verificacao</span>
+            <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+            @if (hasTwoFactorError('required')) {
+              <small>Informe o codigo atual do aplicativo.</small>
+            }
+            @if (hasTwoFactorError('pattern')) {
+              <small>Use exatamente 6 digitos numericos.</small>
+            }
+          </label>
+
+          <footer class="two-factor-dialog__actions">
+            <button type="button" z-button zType="outline" [disabled]="submittingTwoFactor()" (click)="closeTwoFactorDialog()">
+              Cancelar
+            </button>
+            <button type="submit" z-button [zLoading]="submittingTwoFactor()" [disabled]="submittingTwoFactor()">
+              {{ submittingTwoFactor() ? 'Validando...' : 'Validar codigo' }}
+            </button>
+          </footer>
+        </form>
+      </z-card>
+    </div>
+  }
+</section>

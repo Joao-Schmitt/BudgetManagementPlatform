@@ -1,0 +1,32 @@
+<section class="customer-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Clientes'"
+    [summary]="customerCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyCustomerId()"
+    [emptyTitle]="'Nenhum cliente cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro cliente para liberar os proximos fluxos comerciais.'"
+    addLabel="Adicionar"
+    (add)="openCreateModal()"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteCustomer($event)"
+  />
+
+  @if (modalState()) {
+    <app-customer-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      (close)="closeModal()"
+      (submitForm)="saveCustomer($event)"
+    />
+  }
+</section>

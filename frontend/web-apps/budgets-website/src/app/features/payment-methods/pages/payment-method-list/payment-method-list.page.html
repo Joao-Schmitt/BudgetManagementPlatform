@@ -1,0 +1,32 @@
+<section class="payment-method-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Formas de pagamento'"
+    [summary]="paymentMethodCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyPaymentMethodId()"
+    [emptyTitle]="'Nenhuma forma de pagamento cadastrada'"
+    [emptyDescription]="'Comece adicionando a primeira forma de pagamento para organizar a operacao.'"
+    addLabel="Adicionar"
+    (add)="openCreateModal()"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deletePaymentMethod($event)"
+  />
+
+  @if (modalState()) {
+    <app-payment-method-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      (close)="closeModal()"
+      (submitForm)="savePaymentMethod($event)"
+    />
+  }
+</section>

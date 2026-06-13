@@ -1,0 +1,58 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Cadastro de servico</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field">
+        <span>Codigo</span>
+        <input z-input type="text" formControlName="codigo" placeholder="Codigo interno" />
+      </label>
+
+      <label class="field field--wide">
+        <span>Nome</span>
+        <input z-input type="text" formControlName="nome" placeholder="Nome do servico" />
+        @if (hasError('nome', 'required')) {
+          <small>Informe o nome do servico.</small>
+        }
+      </label>
+
+      <label class="field field--full">
+        <span>Descricao</span>
+        <textarea z-input formControlName="descricao" rows="4" placeholder="Descricao opcional"></textarea>
+      </label>
+
+      <label class="field">
+        <span>Valor</span>
+        <input z-input type="text" formControlName="valor" placeholder="0,00" inputmode="decimal" />
+        @if (hasError('valor', 'required')) {
+          <small>Informe o valor do servico.</small>
+        }
+        @if (hasError('valor', 'pattern')) {
+          <small>Use um valor valido, como 150 ou 150,00.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Custo</span>
+        <input z-input type="text" formControlName="custo" placeholder="0,00" inputmode="decimal" />
+        @if (hasError('custo', 'pattern')) {
+          <small>Use um valor valido, como 90 ou 90,00.</small>
+        }
+      </label>
+
+      <footer class="modal-actions field--full">
+        <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+        <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar servico' }}
+        </button>
+      </footer>
+    </form>
+  </z-card>
+</div>

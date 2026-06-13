@@ -1,0 +1,92 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Cadastro de cliente</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field field--full">
+        <span>Nome</span>
+        <input z-input type="text" formControlName="nome" placeholder="Nome do cliente" />
+        @if (hasError('nome', 'required')) {
+          <small>Informe o nome do cliente.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Documento</span>
+        <input z-input type="text" formControlName="documento" placeholder="CPF/CNPJ" />
+      </label>
+
+      <label class="field">
+        <span>E-mail</span>
+        <input z-input type="email" formControlName="email" placeholder="cliente@empresa.com" />
+        @if (hasError('email', 'email')) {
+          <small>Digite um e-mail valido.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Telefone</span>
+        <input z-input type="text" formControlName="telefone" placeholder="(00) 0000-0000" />
+      </label>
+
+      <label class="field">
+        <span>WhatsApp</span>
+        <input z-input type="text" formControlName="whatsApp" placeholder="(00) 00000-0000" />
+      </label>
+
+      <label class="field">
+        <span>CEP</span>
+        <input z-input type="text" formControlName="cep" placeholder="00000-000" />
+      </label>
+
+      <label class="field field--wide">
+        <span>Logradouro</span>
+        <input z-input type="text" formControlName="logradouro" placeholder="Rua, avenida ou travessa" />
+      </label>
+
+      <label class="field">
+        <span>Numero</span>
+        <input z-input type="text" formControlName="numero" placeholder="123" />
+      </label>
+
+      <label class="field field--wide">
+        <span>Complemento</span>
+        <input z-input type="text" formControlName="complemento" placeholder="Sala, bloco ou referencia" />
+      </label>
+
+      <label class="field">
+        <span>Bairro</span>
+        <input z-input type="text" formControlName="bairro" placeholder="Bairro" />
+      </label>
+
+      <label class="field">
+        <span>Cidade</span>
+        <input z-input type="text" formControlName="cidade" placeholder="Cidade" />
+      </label>
+
+      <label class="field">
+        <span>UF</span>
+        <input z-input type="text" formControlName="uf" placeholder="SP" maxlength="2" />
+      </label>
+
+      <label class="field field--full">
+        <span>Observacao</span>
+        <textarea z-input formControlName="observacao" rows="4" placeholder="Informacoes adicionais"></textarea>
+      </label>
+
+      <footer class="modal-actions field--full">
+        <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+        <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar cliente' }}
+        </button>
+      </footer>
+    </form>
+  </z-card>
+</div>
