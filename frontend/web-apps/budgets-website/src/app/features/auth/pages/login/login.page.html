@@ -1,0 +1,45 @@
+<app-auth-shell
+  title="Sua operacao comeca aqui."
+  description="Entre na plataforma para gerenciar orcamentos, clientes e o fluxo comercial com seguranca."
+  alternateLabel="Ainda nao tem conta?"
+  alternateLink="/create-account"
+  alternateText="Criar conta"
+>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <header>
+      <h2>Entrar</h2>
+      <p>Use o e-mail cadastrado e sua senha.</p>
+    </header>
+
+    @if (noticeMessage()) {
+      <z-alert [zDescription]="noticeMessage() ?? ''" />
+    }
+
+    @if (errorMessage()) {
+      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
+    }
+
+    <label>
+      <span>E-mail</span>
+      <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" />
+      @if (hasError('email', 'required')) {
+        <small>Informe o e-mail.</small>
+      }
+      @if (hasError('email', 'email')) {
+        <small>Digite um e-mail valido.</small>
+      }
+    </label>
+
+    <label>
+      <span>Senha</span>
+      <input z-input type="password" formControlName="password" placeholder="Sua senha" />
+      @if (hasError('password', 'required')) {
+        <small>Informe a senha.</small>
+      }
+    </label>
+
+    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
+      {{ submitting() ? 'Entrando...' : 'Entrar' }}
+    </button>
+  </form>
+</app-auth-shell>

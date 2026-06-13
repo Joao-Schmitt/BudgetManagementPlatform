@@ -1,0 +1,33 @@
+<section class="vendor-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Vendedores'"
+    [summary]="vendorCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyVendorId()"
+    [emptyTitle]="'Nenhum vendedor cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro vendedor para liberar a operação comercial.'"
+    addLabel="Adicionar"
+    (add)="openCreateModal()"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteVendor($event)"
+  />
+
+  @if (modalState()) {
+    <app-vendor-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      [establishmentOptions]="establishmentOptions()"
+      (close)="closeModal()"
+      (submitForm)="saveVendor($event)"
+    />
+  }
+</section>

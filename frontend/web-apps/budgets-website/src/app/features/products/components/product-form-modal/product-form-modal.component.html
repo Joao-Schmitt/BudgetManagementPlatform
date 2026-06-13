@@ -1,0 +1,66 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Cadastro de produto</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field">
+        <span>Codigo</span>
+        <input z-input type="text" formControlName="codigo" placeholder="Codigo interno" />
+      </label>
+
+      <label class="field field--wide">
+        <span>Nome</span>
+        <input z-input type="text" formControlName="nome" placeholder="Nome do produto" />
+        @if (hasError('nome', 'required')) {
+          <small>Informe o nome do produto.</small>
+        }
+      </label>
+
+      <label class="field field--full">
+        <span>Descricao</span>
+        <textarea z-input formControlName="descricao" rows="4" placeholder="Descricao opcional"></textarea>
+      </label>
+
+      <label class="field">
+        <span>Unidade</span>
+        <input z-input type="text" formControlName="unidade" placeholder="UN, PC, CX" />
+        @if (hasError('unidade', 'required')) {
+          <small>Informe a unidade do produto.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Valor venda</span>
+        <input z-input type="text" formControlName="valorVenda" placeholder="0,00" inputmode="decimal" />
+        @if (hasError('valorVenda', 'required')) {
+          <small>Informe o valor de venda.</small>
+        }
+        @if (hasError('valorVenda', 'pattern')) {
+          <small>Use um valor valido, como 150 ou 150,00.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Custo</span>
+        <input z-input type="text" formControlName="custo" placeholder="0,00" inputmode="decimal" />
+        @if (hasError('custo', 'pattern')) {
+          <small>Use um valor valido, como 90 ou 90,00.</small>
+        }
+      </label>
+
+      <footer class="modal-actions field--full">
+        <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+        <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar produto' }}
+        </button>
+      </footer>
+    </form>
+  </z-card>
+</div>

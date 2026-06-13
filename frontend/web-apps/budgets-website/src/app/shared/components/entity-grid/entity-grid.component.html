@@ -1,0 +1,96 @@
+<section class="grid gap-4">
+  <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">{{ eyebrow() }}</p>
+      <h2 class="mt-1 text-xl font-semibold tracking-tight text-foreground">{{ title() }}</h2>
+      @if (summary(); as summaryText) {
+        <span class="text-sm text-muted-foreground">{{ summaryText }}</span>
+      }
+    </div>
+
+    <button type="button" z-button class="w-full sm:w-auto" (click)="add.emit()">
+      <ng-icon name="lucidePlus" class="size-4" aria-hidden="true" />
+      {{ addLabel() }}
+    </button>
+  </header>
+
+  <z-card class="overflow-hidden p-0">
+    @if (loading()) {
+      <div class="grid gap-3 p-4">
+        <z-skeleton class="h-9 w-full" />
+        <z-skeleton class="h-9 w-full" />
+        <z-skeleton class="h-9 w-2/3" />
+      </div>
+    } @else if (!rows().length) {
+      <div class="grid min-h-48 place-items-center p-6 text-center">
+        <div class="max-w-md">
+          <strong class="text-sm font-semibold text-foreground">{{ emptyTitle() }}</strong>
+          <p class="mt-2 text-sm text-muted-foreground">{{ emptyDescription() }}</p>
+        </div>
+      </div>
+    } @else {
+      <div class="overflow-auto">
+        <table z-table zSize="compact" class="min-w-[760px]">
+          <thead z-table-header>
+            <tr z-table-row>
+              @for (column of columns(); track trackColumn($index, column)) {
+                <th z-table-head>{{ column.label }}</th>
+              }
+              <th z-table-head class="w-40 text-right">Acoes</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (row of rows(); track trackRow($index, row)) {
+              <tr z-table-row>
+                @for (column of columns(); track trackColumn($index, column)) {
+                  <td z-table-cell>{{ row.cells[column.key] || '-' }}</td>
+                }
+                <td z-table-cell>
+                  <div class="flex justify-end gap-1.5">
+                    <button
+                      type="button"
+                      z-button
+                      zType="ghost"
+                      zSize="icon"
+                      [disabled]="isBusy(row.id)"
+                      (click)="edit.emit(row.item)"
+                      aria-label="Editar registro"
+                      title="Editar registro"
+                    >
+                      <ng-icon name="lucidePencil" class="size-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      z-button
+                      zType="ghost"
+                      zSize="icon"
+                      [disabled]="isBusy(row.id)"
+                      (click)="duplicate.emit(row.item)"
+                      aria-label="Duplicar registro"
+                      title="Duplicar registro"
+                    >
+                      <ng-icon name="lucideCopy" class="size-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      z-button
+                      zType="ghost"
+                      zSize="icon"
+                      class="text-destructive hover:text-destructive"
+                      [disabled]="isBusy(row.id)"
+                      (click)="delete.emit(row.item)"
+                      aria-label="Excluir registro"
+                      title="Excluir registro"
+                    >
+                      <ng-icon name="lucideTrash2" class="size-4" aria-hidden="true" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </z-card>
+</section>

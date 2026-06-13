@@ -1,0 +1,77 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Cadastro de vendedor</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field field--full">
+        <span>Estabelecimento</span>
+        @if (establishmentOptions().length) {
+          <z-select formControlName="estabelecimentoId" zPlaceholder="Selecione um estabelecimento">
+            @for (option of establishmentOptions(); track option.id) {
+              <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+            }
+          </z-select>
+        } @else {
+          <input z-input type="text" formControlName="estabelecimentoId" placeholder="GUID do estabelecimento" />
+        }
+        @if (hasError('estabelecimentoId', 'required')) {
+          <small>Selecione um estabelecimento.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>UsuarioId</span>
+        <input z-input type="text" formControlName="usuarioId" placeholder="GUID opcional do usuario" />
+        @if (hasError('usuarioId', 'pattern')) {
+          <small>Use um GUID valido para o usuario.</small>
+        }
+      </label>
+
+      <label class="field field--wide">
+        <span>Nome</span>
+        <input z-input type="text" formControlName="nome" placeholder="Nome do vendedor" />
+        @if (hasError('nome', 'required')) {
+          <small>Informe o nome do vendedor.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>E-mail</span>
+        <input z-input type="email" formControlName="email" placeholder="vendedor@empresa.com" />
+        @if (hasError('email', 'email')) {
+          <small>Digite um e-mail valido.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Telefone</span>
+        <input z-input type="text" formControlName="telefone" placeholder="(00) 0000-0000" />
+      </label>
+
+      <label class="field">
+        <span>Comissao padrao</span>
+        <input z-input type="text" formControlName="percentualComissaoPadrao" placeholder="0,00" inputmode="decimal" />
+        @if (hasError('percentualComissaoPadrao', 'required')) {
+          <small>Informe a comissao padrao.</small>
+        }
+        @if (hasError('percentualComissaoPadrao', 'pattern')) {
+          <small>Use um valor valido, como 10 ou 10,5.</small>
+        }
+      </label>
+
+      <footer class="modal-actions field--full">
+        <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+        <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar vendedor' }}
+        </button>
+      </footer>
+    </form>
+  </z-card>
+</div>
