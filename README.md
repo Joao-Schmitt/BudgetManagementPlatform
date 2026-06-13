@@ -15,6 +15,7 @@ O projeto tem como objetivo servir como referência de arquitetura corporativa m
 ## Autenticação e Segurança
 
 * Autenticação baseada em Cookies HttpOnly
+* Refresh Token
 * Autenticação em Dois Fatores (2FA)
 * Compatível com Google Authenticator, Microsoft Authenticator e aplicativos TOTP
 * Controle de acesso baseado em Claims

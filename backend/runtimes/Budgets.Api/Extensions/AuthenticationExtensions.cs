@@ -14,10 +14,8 @@ namespace Budgets.Api.Extensions
                     options.Cookie.HttpOnly = true;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.SameSite = SameSiteMode.None;
-                    options.ExpireTimeSpan = TimeSpan.FromHours(6);
-                    options.SlidingExpiration = true;
-                    options.LoginPath = "/auth/unauthorized";
-                    options.AccessDeniedPath = "/auth/forbidden";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                    options.SlidingExpiration = false;
 
                     options.Events.OnRedirectToLogin = context =>
                     {

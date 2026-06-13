@@ -27,6 +27,8 @@ using Budgets.Application.FormaPagamento.Interfaces;
 using Budgets.Application.FormaPagamento.Services;
 using Budgets.Domain.FormaPagamento.Interfaces;
 using Budgets.Application.Security.Interfaces;
+using Budgets.Application.User.Interfaces;
+using Budgets.Application.User.Services;
 
 namespace Budgets.Infrastructure.IoC
 {
@@ -48,9 +50,11 @@ namespace Budgets.Infrastructure.IoC
             services.AddScoped<IProdutoService, ProdutoService>();
             services.AddScoped<IServicoService, ServicoService>();
             services.AddScoped<IFormaPagamentoService, FormaPagamentoService>();
+            services.AddScoped<IUsuarioService, UsuarioService>();
 
             // Repositories
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IUsuarioRefreshTokenRepository, UsuarioRefreshTokenRepository>();
             services.AddScoped<IEstabelecimentoRepository, EstabelecimentoRepository>();
             services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IVendedorRepository, VendedorRepository>();

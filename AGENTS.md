@@ -19,6 +19,7 @@ Antes de implementar qualquer alteração, siga os padrões definidos neste arqu
   - `frontend-design`
   - `postgresql-optimization`
   - `ui-ux-pro-max`
+  - `shadcn`
 
 - `docs/`
   - `angular-architecture.md`
@@ -73,6 +74,7 @@ Para qualquer alteração visual, layout, responsividade, telas, grids, cards, h
 - `.agents/skills/design-taste-frontend`
 - `.agents/skills/frontend-design`
 - `.agents/skills/ui-ux-pro-max`
+- `.agents/skills/shadcn`
 
 Regras obrigatórias:
 
@@ -83,6 +85,7 @@ Regras obrigatórias:
 - Tabelas/grids devem ser legíveis, compactas e eficientes.
 - Evitar componentes grandes sem necessidade.
 - Manter consistência entre cores, espaçamentos, bordas e tipografia.
+- Utilize os componentes e ícones shadcn.
 
 ---
 

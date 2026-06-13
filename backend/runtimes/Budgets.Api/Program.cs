@@ -1,5 +1,6 @@
 using Budgets.Api.Extensions;
 using Budgets.Api.Handlers;
+using Budgets.Api.Security;
 using Budgets.Infrastructure.IoC;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -13,7 +14,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DefaultCors", policy =>
     {
         policy
-            .WithOrigins("http://localhost:51469")
+            .WithOrigins("http://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -73,7 +74,8 @@ app.Map("/session", (ClaimsPrincipal user) =>
     {
         Id = user.FindFirstValue(ClaimTypes.NameIdentifier),
         Name = user.FindFirstValue(ClaimTypes.Name),
-        Email = user.FindFirstValue(ClaimTypes.Email)
+        Email = user.FindFirstValue(ClaimTypes.Email),
+        TwoFactorEnabled = user.IsTwoFactorEnabled()
     });
 })
 .RequireAuthorization();
