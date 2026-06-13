@@ -13,5 +13,9 @@ namespace Budgets.Application.Auth.Interfaces
         Result<Usuario> CreateUser(CreateAccountArgs args);
         Task<Result<EnableTwoFactorResult>> EnableTwoFactorAsync(Guid userId);
         Task<Result> ConfirmTwoFactorAsync(Guid userId, string code);
+        Task<Result> DisableTwoFactorAsync(Guid userId, string code);
+        Result SaveUserRefreshToken(Guid userId, string refreshTokenHash);
+        Task<Result<Usuario>> GetUserByRefreshTokenAsync(string refreshToken);
+        Result InvalidateRefreshToken(string refreshToken);
     }
 }

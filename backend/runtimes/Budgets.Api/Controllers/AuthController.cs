@@ -2,13 +2,15 @@
 using Budgets.Api.Security;
 using Budgets.Application.Auth.Interfaces;
 using Budgets.Application.Auth.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Budgets.Shared.Results;
-using System.Security.Claims;
 using Budgets.Domain.User.Entities;
+using Budgets.Shared.Results;
+using Budgets.Shared.Security;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Budgets.Api.Controllers
 {
@@ -56,7 +58,8 @@ namespace Budgets.Api.Controllers
             {
                 user.Id,
                 user.Name,
-                user.Email
+                user.Email,
+                user.TwoFactorEnabled
             });
         }
 
@@ -82,7 +85,8 @@ namespace Budgets.Api.Controllers
             {
                 user.Id,
                 user.Name,
-                user.Email
+                user.Email,
+                user.TwoFactorEnabled
             });
         }
 
@@ -105,7 +109,8 @@ namespace Budgets.Api.Controllers
             {
                 result.Value.Id,
                 result.Value.Name,
-                result.Value.Email
+                result.Value.Email,
+                result.Value.TwoFactorEnabled
             });
         }
 
@@ -143,6 +148,70 @@ namespace Budgets.Api.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> DisableTwoFactor([FromQuery]string code)
+        {
+            var result = await _authService.DisableTwoFactorAsync(
+                User.GetUserId(),
+                code
+            );
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
+                return Unauthorized();
+
+            var userResult = await _authService.GetUserByRefreshTokenAsync(refreshToken);
+
+            if (!userResult.Success || userResult.Value == null)
+                return Unauthorized(userResult.Error);
+
+            var claims = ClaimsHelper.Create(userResult.Value);
+
+            await Authenticate(claims);
+
+            var newRefreshToken = TokenHelper.GenerateToken();
+            var newRefreshTokenHash = TokenHelper.Hash(refreshToken);
+
+            _authService.SaveUserRefreshToken(claims.GetUserId(), newRefreshTokenHash);
+            SetRefreshTokenCookie(Response, refreshToken);
+
+            return Ok(new
+            {
+                userResult.Value.Id,
+                userResult.Value.Name,
+                userResult.Value.Email,
+                userResult.Value.TwoFactorEnabled
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+                _authService.InvalidateRefreshToken(refreshToken);
+
+            await HttpContext.SignOutAsync();
+
+            Response.Cookies.Delete("auth");
+            Response.Cookies.Delete("refreshToken");
+
+            return Ok();
+        }
+
+
         #region Helpers
         private async Task Authenticate(ClaimsPrincipal claims)
         {
@@ -152,9 +221,28 @@ namespace Budgets.Api.Controllers
                 new AuthenticationProperties
                 {
                     IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(6)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 }
             );
+
+            var refreshToken = TokenHelper.GenerateToken();
+            var refreshTokenHash = TokenHelper.Hash(refreshToken);
+
+            _authService.SaveUserRefreshToken(claims.GetUserId(), refreshTokenHash);
+
+            SetRefreshTokenCookie(Response, refreshToken);
+        }
+
+        private void SetRefreshTokenCookie(HttpResponse response, string refreshToken)
+        {
+            response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
+                Path = "/"
+            });
         }
         #endregion
     }
