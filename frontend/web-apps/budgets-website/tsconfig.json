@@ -15,15 +15,12 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
-<<<<<<< Updated upstream
     "baseUrl": "./",
     "paths": {
       "@/*": [
         "src/app/*"
       ]
     },
-=======
->>>>>>> Stashed changes
     "target": "ES2022",
     "module": "ES2022"
   },

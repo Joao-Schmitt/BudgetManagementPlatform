@@ -1,7 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCopy, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
+import {
+  lucideCopy,
+  lucideDownload,
+  lucideEye,
+  lucideMail,
+  lucidePencil,
+  lucidePlus,
+  lucideTrash2
+} from '@ng-icons/lucide';
 
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
@@ -27,13 +35,18 @@ export interface EntityGridRow<TItem> {
   imports: [CommonModule, NgIcon, ZardButtonComponent, ZardCardComponent, ZardSkeletonComponent, ZardTableImports],
   templateUrl: './entity-grid.component.html',
   styleUrl: './entity-grid.component.scss',
-  viewProviders: [provideIcons({ lucideCopy, lucidePencil, lucidePlus, lucideTrash2 })]
+  viewProviders: [
+    provideIcons({ lucideCopy, lucideDownload, lucideEye, lucideMail, lucidePencil, lucidePlus, lucideTrash2 })
+  ]
 })
 export class EntityGridComponent<TItem extends { id: GridRowId }> {
   readonly eyebrow = input('Cadastro');
   readonly title = input.required<string>();
   readonly summary = input<string | null>(null);
   readonly addLabel = input('Adicionar');
+  readonly viewLabel = input<string | null>(null);
+  readonly downloadLabel = input<string | null>(null);
+  readonly sendLabel = input<string | null>(null);
   readonly loading = input(false);
   readonly emptyTitle = input('Nenhum registro encontrado');
   readonly emptyDescription = input('Use o botao acima para adicionar o primeiro registro.');
@@ -42,6 +55,9 @@ export class EntityGridComponent<TItem extends { id: GridRowId }> {
   readonly busyRowId = input<GridRowId | null>(null);
 
   readonly add = output<void>();
+  readonly view = output<TItem>();
+  readonly download = output<TItem>();
+  readonly send = output<TItem>();
   readonly edit = output<TItem>();
   readonly duplicate = output<TItem>();
   readonly delete = output<TItem>();

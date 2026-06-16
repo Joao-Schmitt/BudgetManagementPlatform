@@ -1,0 +1,102 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Template de orcamento</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <div class="modal-layout">
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+        <label class="field field--wide">
+          <span>Titulo</span>
+          <input z-input type="text" formControlName="titulo" placeholder="Ex: Proposta comercial padrao" />
+          @if (hasError('titulo', 'required')) {
+            <small>Informe o titulo do template.</small>
+          }
+          @if (hasError('titulo', 'maxlength')) {
+            <small>Use no maximo 200 caracteres.</small>
+          }
+        </label>
+
+        <label class="field field--wide">
+          <span>Descricao</span>
+          <input z-input type="text" formControlName="descricao" placeholder="Descricao opcional" />
+          @if (hasError('descricao', 'maxlength')) {
+            <small>Use no maximo 500 caracteres.</small>
+          }
+        </label>
+
+        <label class="field field--full">
+          <span>HTML</span>
+          <textarea z-input formControlName="html" rows="14" spellcheck="false" placeholder="<html>...</html>"></textarea>
+          @if (hasError('html', 'required')) {
+            <small>Informe o HTML do template.</small>
+          }
+        </label>
+
+        <footer class="modal-actions field--full">
+          <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+          <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+            {{ saving() ? 'Salvando...' : 'Salvar template' }}
+          </button>
+        </footer>
+      </form>
+
+      <aside class="macro-panel" aria-label="Macros disponiveis">
+        <div class="macro-panel__header">
+          <div>
+            <p class="macro-panel__eyebrow">Macros disponiveis</p>
+            <h3>Atalhos para o HTML</h3>
+          </div>
+
+          @if (!macrosLoading() && !macrosError()) {
+            <z-badge zType="secondary">{{ macros().length }} itens</z-badge>
+          }
+        </div>
+
+        <p class="macro-panel__description">
+          Use as macros abaixo para montar o template com textos reutilizaveis e padronizados.
+        </p>
+
+        <div class="macro-panel__content">
+          @if (macrosLoading()) {
+            <div class="macro-skeletons">
+              @for (item of macroSkeletonRows; track item) {
+                <div class="macro-skeleton">
+                  <z-skeleton class="macro-skeleton__tag"></z-skeleton>
+                  <z-skeleton class="macro-skeleton__line"></z-skeleton>
+                  <z-skeleton class="macro-skeleton__line macro-skeleton__line--short"></z-skeleton>
+                </div>
+              }
+            </div>
+          } @else if (macrosError()) {
+            <div class="macro-error">
+              <p>{{ macrosError() }}</p>
+            </div>
+          } @else if (!macros().length) {
+            <z-empty
+              class="macro-empty"
+              zTitle="Nenhuma macro cadastrada"
+              zDescription="Quando novas macros forem adicionadas no backend, elas aparecerao aqui."
+            />
+          } @else {
+            <div class="macro-list">
+              @for (macro of macros(); track macro.id) {
+                <article class="macro-item">
+                  <div class="macro-item__top">
+                    <z-badge zType="outline" zShape="pill" class="macro-item__badge">{{ macro.macro }}</z-badge>
+                  </div>
+                  <p class="macro-item__description">{{ macro.descricao }}</p>
+                </article>
+              }
+            </div>
+          }
+        </div>
+      </aside>
+    </div>
+  </z-card>
+</div>

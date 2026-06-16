@@ -145,7 +145,15 @@ namespace Budgets.Api.Controllers
             if (!result.Success)
                 return BadRequest(result.Error);
 
-            return Ok();
+            await Authenticate(ClaimsHelper.Create(result.Value!));
+
+            return Ok(new
+            {
+                result.Value!.Id,
+                result.Value.Name,
+                result.Value.Email,
+                result.Value.TwoFactorEnabled
+            });
         }
 
         [Authorize]

@@ -149,26 +149,26 @@ namespace Budgets.Application.Auth.Services
             return Result<EnableTwoFactorResult>.Ok(new EnableTwoFactorResult(secret, otpAuthUrl));
         }
 
-        public async Task<Result> ConfirmTwoFactorAsync(Guid userId, string code)
+        public async Task<Result<Usuario>> ConfirmTwoFactorAsync(Guid userId, string code)
         {
             if (userId == Guid.Empty)
-                return Result.Fail("Usuário inválido.");
+                return Result<Usuario>.Fail("Usuário inválido.");
 
             var user = await _userRepository.GetByIdAsync(userId);
 
             if (user is null)
-                return Result.Fail("Usuário não encontrado.");
+                return Result<Usuario>.Fail("Usuário não encontrado.");
 
             if (string.IsNullOrWhiteSpace(user.TwoFactorSecret))
-                return Result.Fail("Configuração de 2FA não iniciada.");
+                return Result<Usuario>.Fail("Configuração de 2FA não iniciada.");
 
             if (user.TwoFactorEnabled)
-                return Result.Fail("2FA já está ativo para este usuário.");
+                return Result<Usuario>.Fail("2FA já está ativo para este usuário.");
 
             var validCode = _2FAHelper.ValidateAuthenticatorCode(user.TwoFactorSecret, code);
 
             if (!validCode)
-                return Result.Fail("Código inválido.");
+                return Result<Usuario>.Fail("Código inválido.");
 
             user.TwoFactorEnabled = true;
             user.TwoFactorEnabledAt = DateTimeOffset.UtcNow;
@@ -176,7 +176,7 @@ namespace Budgets.Application.Auth.Services
             _userRepository.Update(user);
             _uow.Commit();
 
-            return Result.Ok();
+            return Result<Usuario>.Ok(user);
         }
 
         public async Task<Result> DisableTwoFactorAsync(Guid userId, string code)

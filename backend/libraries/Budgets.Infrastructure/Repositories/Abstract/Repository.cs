@@ -17,6 +17,7 @@ namespace Budgets.Infrastructure.Repositories.Abstract
             _db = context.Set<TEntity>();
         }
 
+        public virtual IQueryable<TEntity> GetAll() => GetAll(x => true);
         public virtual IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate, bool readOnly = false)
         {
             if (readOnly) return _db.Where(predicate).AsNoTracking().AsQueryable();

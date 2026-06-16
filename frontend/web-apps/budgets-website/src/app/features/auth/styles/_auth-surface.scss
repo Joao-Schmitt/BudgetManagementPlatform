@@ -1,0 +1,133 @@
+@mixin auth-card-form {
+  .auth-panel,
+  .auth-form,
+  .field {
+    display: grid;
+  }
+
+  .auth-panel,
+  .auth-form {
+    gap: 1rem;
+  }
+
+  .auth-panel {
+    padding: 1.55rem;
+  }
+
+  .auth-panel__header {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .auth-panel__header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.65rem;
+    font-weight: 800;
+  }
+
+  .auth-panel__header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.94rem;
+    line-height: 1.52;
+  }
+
+  .auth-panel__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-primary) 10%, white);
+    color: var(--brand-primary);
+  }
+
+  .field {
+    gap: 0.4rem;
+  }
+
+  .field > span {
+    color: #0f172a;
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  .field__control {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .field__icon,
+  .field__action {
+    position: absolute;
+    color: #94a3b8;
+  }
+
+  .field__icon {
+    left: 0.95rem;
+    pointer-events: none;
+  }
+
+  .field__control input[z-input] {
+    min-height: 3rem;
+    padding-inline: 2.55rem 2.7rem;
+    border-radius: 1rem;
+    border-color: #e2e8f0;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+  }
+
+  .field__control input[z-input]:focus {
+    border-color: color-mix(in srgb, var(--brand-primary) 42%, white);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 12%, transparent);
+  }
+
+  .field__action {
+    right: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+  }
+
+  .submit-button {
+    min-height: 3.05rem;
+    border: 0;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-strong));
+    box-shadow: 0 16px 28px color-mix(in srgb, var(--brand-primary) 22%, transparent);
+  }
+
+  .secondary-button {
+    min-height: 2.95rem;
+    border-radius: 1rem;
+  }
+
+  .actions-row {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .stack-note {
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .auth-panel {
+      padding: 1.1rem;
+    }
+
+    .auth-panel__header h2 {
+      font-size: 1.45rem;
+    }
+  }
+}

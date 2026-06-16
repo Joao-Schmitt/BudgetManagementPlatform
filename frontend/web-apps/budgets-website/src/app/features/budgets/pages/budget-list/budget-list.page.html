@@ -1,0 +1,49 @@
+<section class="budget-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  @if (successMessage(); as message) {
+    <z-alert zTitle="Operacao concluida" [zDescription]="message" />
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Comercial'"
+    [title]="'Orcamentos'"
+    [summary]="budgetCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyBudgetId()"
+    [emptyTitle]="'Nenhum orcamento cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro orcamento para centralizar propostas, PDF e envio por e-mail.'"
+    addLabel="Adicionar"
+    viewLabel="Visualizar HTML"
+    downloadLabel="Baixar PDF"
+    sendLabel="Enviar por e-mail"
+    (add)="openCreateModal()"
+    (view)="viewBudget($event)"
+    (download)="downloadBudget($event)"
+    (send)="sendBudgetByEmail($event)"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteBudget($event)"
+  />
+
+  @if (modalState()) {
+    <app-budget-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      [customerOptions]="customerOptions()"
+      [establishmentOptions]="establishmentOptions()"
+      [vendorOptions]="vendorOptions()"
+      [templateOptions]="templateOptions()"
+      [paymentMethodOptions]="paymentMethodOptions()"
+      [productOptions]="productOptions()"
+      [serviceOptions]="serviceOptions()"
+      (close)="closeModal()"
+      (submitForm)="saveBudget($event)"
+    />
+  }
+</section>

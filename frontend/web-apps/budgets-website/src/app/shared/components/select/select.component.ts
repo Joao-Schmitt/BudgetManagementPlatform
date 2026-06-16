@@ -45,7 +45,7 @@ import {
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
 type OnTouchedType = () => void;
-type OnChangeType = (value: string) => void;
+type OnChangeType = (value: string | string[]) => void;
 
 const COMPACT_MODE_WIDTH_THRESHOLD = 100;
 
@@ -172,7 +172,7 @@ export class ZardSelectComponent implements ControlValueAccessor, OnDestroy {
     return this.provideLabelForSingleSelectMode(selectedValue as string);
   });
 
-  private onChange: OnChangeType = (_value: string) => {
+  private onChange: OnChangeType = (_value: string | string[]) => {
     // ControlValueAccessor onChange callback
   };
 
@@ -274,8 +274,9 @@ export class ZardSelectComponent implements ControlValueAccessor, OnDestroy {
 
       return value;
     });
-    this.onChange(value);
-    this.zSelectionChange.emit(this.zValue());
+    const currentValue = this.zValue();
+    this.onChange(currentValue);
+    this.zSelectionChange.emit(currentValue);
 
     if (this.zMultiple()) {
       // in multiple mode it can happen that button changes size because of selection badges,
@@ -638,7 +639,7 @@ export class ZardSelectComponent implements ControlValueAccessor, OnDestroy {
     }
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | string[]) => void): void {
     this.onChange = fn;
   }
 

@@ -4,6 +4,7 @@ using Budgets.Api.Security;
 using Budgets.Infrastructure.IoC;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Resend;
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 
@@ -56,6 +57,14 @@ builder.Services.AddProblemDetails();
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddDependencyInjection(builder.Configuration);
+builder.Services.AddEmailQueueProcessing();
+
+builder.Services.AddOptions();
+
+builder.Services.AddResend(options =>
+{
+    options.ApiToken = builder.Configuration["Email:ApiToken"]!;
+});
 
 var app = builder.Build();
 

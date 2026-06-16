@@ -5,6 +5,11 @@ export interface UserProfile {
   twoFactorEnabled?: boolean;
 }
 
+export interface EnableTwoFactorResponse {
+  secret: string;
+  optAuthUrl: string;
+}
+
 export interface UpdateUserNameRequest {
   name: string;
 }

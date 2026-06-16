@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
+  EnableTwoFactorResponse,
   UpdateUserEmailRequest,
   UpdateUserNameRequest,
   UpdateUserPasswordRequest,
@@ -26,6 +27,16 @@ export class UserSettingsService {
 
   updatePassword(request: UpdateUserPasswordRequest): Observable<void> {
     return this.http.put<void>(`${this.userUrl}/UpdatePassword`, request);
+  }
+
+  enableTwoFactor(): Observable<EnableTwoFactorResponse> {
+    return this.http.post<EnableTwoFactorResponse>(`${this.authUrl}/EnableTwoFactor`, {});
+  }
+
+  confirmTwoFactor(code: string): Observable<UserProfile | void> {
+    const params = new HttpParams().set('code', code);
+
+    return this.http.post<UserProfile>(`${this.authUrl}/ConfirmTwoFactor`, {}, { params });
   }
 
   disableTwoFactor(code: string): Observable<void> {

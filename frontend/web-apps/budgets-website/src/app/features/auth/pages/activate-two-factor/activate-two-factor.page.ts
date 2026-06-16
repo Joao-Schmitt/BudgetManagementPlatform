@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLockKeyhole, lucideQrCode, lucideShieldCheck } from '@ng-icons/lucide';
 import QRCode from 'qrcode';
 
-import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
+import { ToastService } from '@/shared/components/toast';
 
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { EnableTwoFactorResponse } from '../../../../core/auth/models/auth.model';
@@ -17,18 +19,25 @@ import { AuthShellComponent } from '../../components/auth-shell/auth-shell.compo
 @Component({
   selector: 'app-activate-two-factor-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, AuthShellComponent, ZardAlertComponent, ZardButtonComponent, ZardCardComponent, ZardInputDirective],
+  imports: [CommonModule, ReactiveFormsModule, AuthShellComponent, NgIcon, ZardButtonComponent, ZardCardComponent, ZardInputDirective],
   templateUrl: './activate-two-factor.page.html',
-  styleUrl: './activate-two-factor.page.scss'
+  styleUrl: './activate-two-factor.page.scss',
+  viewProviders: [
+    provideIcons({
+      lucideLockKeyhole,
+      lucideQrCode,
+      lucideShieldCheck,
+    }),
+  ],
 })
 export class ActivateTwoFactorPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authState = inject(AuthStateService);
+  private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
   protected readonly step = signal<'question' | 'setup'>('question');
-  protected readonly errorMessage = signal<string | null>(null);
   protected readonly loadingSetup = signal(false);
   protected readonly submitting = signal(false);
   protected readonly setupData = signal<EnableTwoFactorResponse | null>(null);
@@ -50,7 +59,6 @@ export class ActivateTwoFactorPage {
       return;
     }
 
-    this.errorMessage.set(null);
     this.loadingSetup.set(true);
 
     this.authState
@@ -65,7 +73,7 @@ export class ActivateTwoFactorPage {
         },
         error: (error: unknown) => {
           this.loadingSetup.set(false);
-          this.errorMessage.set(this.extractErrorMessage(error));
+          this.toastService.danger('Nao foi possivel iniciar a configuracao', this.extractErrorMessage(error));
         }
       });
   }
@@ -77,10 +85,10 @@ export class ActivateTwoFactorPage {
   submitCode(): void {
     if (this.form.invalid || this.submitting()) {
       this.form.markAllAsTouched();
+      this.showValidationToast();
       return;
     }
 
-    this.errorMessage.set(null);
     this.submitting.set(true);
 
     this.authState
@@ -90,14 +98,20 @@ export class ActivateTwoFactorPage {
         next: () => this.submitting.set(false),
         error: (error: unknown) => {
           this.submitting.set(false);
-          this.errorMessage.set(this.extractErrorMessage(error));
+          this.toastService.danger('Nao foi possivel confirmar', this.extractErrorMessage(error));
         }
       });
   }
 
-  protected hasCodeError(errorName: string): boolean {
-    const control = this.form.controls.code;
-    return control.touched && control.hasError(errorName);
+  private showValidationToast(): void {
+    if (this.form.controls.code.hasError('required')) {
+      this.toastService.warning('Informe o codigo', 'Digite o codigo atual do aplicativo autenticador.');
+      return;
+    }
+
+    if (this.form.controls.code.hasError('pattern')) {
+      this.toastService.warning('Codigo invalido', 'Use exatamente 6 digitos numericos.');
+    }
   }
 
   private async renderQrCode(otpAuthUrl: string): Promise<void> {
@@ -113,7 +127,7 @@ export class ActivateTwoFactorPage {
 
       this.qrCodeDataUrl.set(dataUrl);
     } catch {
-      this.errorMessage.set('Nao foi possivel renderizar o QR code. Use o codigo secreto abaixo.');
+      this.toastService.warning('QR code indisponivel', 'Use o codigo secreto abaixo para cadastrar manualmente.');
       this.qrCodeDataUrl.set(null);
     }
   }

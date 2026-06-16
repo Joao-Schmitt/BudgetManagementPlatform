@@ -1,0 +1,168 @@
+<div class="dialog-backdrop" (click)="close.emit()">
+  <z-card class="modal-panel" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="modal-eyebrow">Orcamento</p>
+        <h2>{{ title() }}</h2>
+      </div>
+
+      <button type="button" z-button zType="ghost" zSize="icon" (click)="close.emit()" aria-label="Fechar popup">x</button>
+    </header>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <label class="field">
+        <span>Estabelecimento</span>
+        <z-select formControlName="estabelecimentoId" zPlaceholder="Selecione um estabelecimento">
+          @for (option of establishmentOptions(); track option.id) {
+            <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+          }
+        </z-select>
+        @if (hasFieldError('estabelecimentoId', 'required')) {
+          <small>Selecione um estabelecimento.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Cliente</span>
+        <z-select formControlName="clienteId" zPlaceholder="Selecione um cliente">
+          @for (option of customerOptions(); track option.id) {
+            <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+          }
+        </z-select>
+        @if (hasFieldError('clienteId', 'required')) {
+          <small>Selecione um cliente.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Vendedor</span>
+        <z-select formControlName="vendedorId" zPlaceholder="Selecione um vendedor">
+          @for (option of vendorOptions(); track option.id) {
+            <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+          }
+        </z-select>
+        @if (hasFieldError('vendedorId', 'required')) {
+          <small>Selecione um vendedor.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Template</span>
+        <z-select formControlName="templateOrcamentoId" zPlaceholder="Selecione um template">
+          @for (option of templateOptions(); track option.id) {
+            <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+          }
+        </z-select>
+        @if (hasFieldError('templateOrcamentoId', 'required')) {
+          <small>Selecione um template.</small>
+        }
+      </label>
+
+      <label class="field field--full">
+        <span>Formas de pagamento</span>
+        <z-select formControlName="formaPagamentoIds" [zMultiple]="true" zPlaceholder="Selecione uma ou mais formas">
+          @for (option of paymentMethodOptions(); track option.id) {
+            <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+          }
+        </z-select>
+        @if (paymentMethodsError()) {
+          <small>{{ paymentMethodsError() }}</small>
+        }
+      </label>
+
+      <label class="field field--full">
+        <span>Observacoes</span>
+        <textarea z-input rows="4" formControlName="observacoes" placeholder="Observacoes adicionais do orcamento"></textarea>
+      </label>
+
+      <section class="items-section field--full">
+        <header class="items-section__header">
+          <div>
+            <span class="items-section__eyebrow">Itens do orcamento</span>
+            <h3>Produtos e servicos</h3>
+          </div>
+
+          <button type="button" z-button zType="outline" zSize="sm" (click)="addItem()">
+            <ng-icon name="lucidePlus" class="size-4" aria-hidden="true" />
+            Adicionar item
+          </button>
+        </header>
+
+        @if (itemsError()) {
+          <p class="items-section__error">{{ itemsError() }}</p>
+        }
+
+        <div class="items-list" formArrayName="itens">
+          @for (itemGroup of itemControls.controls; track $index) {
+            <div class="item-card" [formGroupName]="$index">
+              <div class="item-card__grid">
+                <label class="field">
+                  <span>Tipo</span>
+                  <z-select formControlName="tipo" zPlaceholder="Selecione o tipo" (zSelectionChange)="updateItemType($index)">
+                    @for (itemType of itemTypes; track itemType.value) {
+                      <z-select-item [zValue]="itemType.value">{{ itemType.label }}</z-select-item>
+                    }
+                  </z-select>
+                </label>
+
+                <label class="field field--grow">
+                  <span>Item</span>
+                  <z-select formControlName="referenciaId" zPlaceholder="Selecione o item" (zSelectionChange)="syncItemPrice($index)">
+                    @for (option of itemReferenceOptions($index); track option.id) {
+                      <z-select-item [zValue]="option.id">{{ option.label }}</z-select-item>
+                    }
+                  </z-select>
+                  @if (hasItemError($index, 'referenciaId', 'required')) {
+                    <small>Selecione um item.</small>
+                  }
+                </label>
+
+                <label class="field">
+                  <span>Quantidade</span>
+                  <input z-input type="text" inputmode="decimal" formControlName="quantidade" placeholder="1" />
+                  @if (hasItemError($index, 'quantidade', 'required')) {
+                    <small>Informe a quantidade.</small>
+                  }
+                  @if (hasItemError($index, 'quantidade', 'pattern')) {
+                    <small>Use um valor numerico valido.</small>
+                  }
+                </label>
+
+                <label class="field">
+                  <span>Valor unitario</span>
+                  <input z-input type="text" inputmode="decimal" formControlName="valorUnitario" placeholder="0,00" />
+                  @if (hasItemError($index, 'valorUnitario', 'required')) {
+                    <small>Informe o valor unitario.</small>
+                  }
+                  @if (hasItemError($index, 'valorUnitario', 'pattern')) {
+                    <small>Use um valor valido, como 10 ou 10,50.</small>
+                  }
+                </label>
+              </div>
+
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                zSize="icon"
+                class="item-card__remove"
+                (click)="removeItem($index)"
+                aria-label="Remover item"
+                title="Remover item"
+              >
+                <ng-icon name="lucideTrash2" class="size-4" aria-hidden="true" />
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+
+      <footer class="modal-actions field--full">
+        <button type="button" z-button zType="outline" (click)="close.emit()">Cancelar</button>
+        <button type="submit" z-button [zLoading]="saving()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar orcamento' }}
+        </button>
+      </footer>
+    </form>
+  </z-card>
+</div>

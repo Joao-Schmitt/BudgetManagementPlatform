@@ -1,26 +1,4 @@
 <section class="settings-page">
-  <div class="settings-page__summary">
-    <z-card class="identity-card">
-      <div class="identity-card__avatar" aria-hidden="true">
-        {{ currentUser()?.name?.charAt(0) || 'U' }}
-      </div>
-
-      <div>
-        <z-badge zType="secondary">Conta conectada</z-badge>
-        <h2>{{ currentUser()?.name }}</h2>
-        <p>{{ currentUser()?.email }}</p>
-      </div>
-    </z-card>
-
-    <z-card class="security-note">
-      <ng-icon name="lucideShieldCheck" class="size-5" aria-hidden="true" />
-      <div>
-        <strong>Validacao sensivel pelo backend</strong>
-        <span>Alteracoes protegidas por 2FA so sao aceitas quando a API confirma o codigo atual.</span>
-      </div>
-    </z-card>
-  </div>
-
   @if (successMessage()) {
     <z-alert zTitle="Alteracao salva" [zDescription]="successMessage() ?? ''" />
   }
@@ -154,7 +132,7 @@
         </span>
         <div>
           <h2>Autenticacao de dois fatores</h2>
-          <p>Desative somente se tiver certeza. A API exige o codigo atual antes de aplicar a mudanca.</p>
+          <p>Ative ou desative a segunda camada de protecao. A API valida o codigo antes de aplicar a mudanca.</p>
         </div>
 
         <button
@@ -163,8 +141,8 @@
           role="switch"
           [class.is-on]="isTwoFactorEnabled()"
           [attr.aria-checked]="isTwoFactorEnabled()"
-          [disabled]="!isTwoFactorEnabled() || disablingTwoFactor()"
-          (click)="requestDisableTwoFactor()"
+          [disabled]="twoFactorSwitchDisabled()"
+          (click)="toggleTwoFactor()"
         >
           <span class="switch-control__track" aria-hidden="true">
             <span class="switch-control__thumb"></span>
@@ -204,6 +182,24 @@
 
         @if (twoFactorError()) {
           <z-alert zType="destructive" [zDescription]="twoFactorError() ?? ''" />
+        }
+
+        @if (pendingTwoFactorAction() === 'enableTwoFactor') {
+          <div class="two-factor-setup">
+            <z-card class="qr-card">
+              @if (qrCodeDataUrl()) {
+                <img [src]="qrCodeDataUrl()" alt="QR code para ativar autenticacao de dois fatores" />
+              } @else {
+                <div class="qr-placeholder">QR indisponivel</div>
+              }
+            </z-card>
+
+            <z-card class="secret-panel">
+              <p class="label">Codigo secreto</p>
+              <code>{{ twoFactorSetupData()?.secret }}</code>
+              <p class="hint">Se preferir, cadastre manualmente este segredo no aplicativo autenticador.</p>
+            </z-card>
+          </div>
         }
 
         <form class="two-factor-form" [formGroup]="twoFactorForm" (ngSubmit)="submitTwoFactor()">

@@ -29,6 +29,16 @@ using Budgets.Domain.FormaPagamento.Interfaces;
 using Budgets.Application.Security.Interfaces;
 using Budgets.Application.User.Interfaces;
 using Budgets.Application.User.Services;
+using Budgets.Application.Template.Interfaces;
+using Budgets.Application.Template.Services;
+using Budgets.Application.Orcamento.Interfaces;
+using Budgets.Application.Orcamento.Services;
+using Budgets.Domain.Orcamento.Interfaces;
+using Budgets.Domain.Template.Interfaces;
+using Budgets.Infrastructure.Services;
+using Budgets.Application.Email.Interfaces;
+using Budgets.Application.Email.Services;
+using Budgets.Domain.Email.Interfaces;
 
 namespace Budgets.Infrastructure.IoC
 {
@@ -51,6 +61,11 @@ namespace Budgets.Infrastructure.IoC
             services.AddScoped<IServicoService, ServicoService>();
             services.AddScoped<IFormaPagamentoService, FormaPagamentoService>();
             services.AddScoped<IUsuarioService, UsuarioService>();
+            services.AddScoped<ITemplateOrcamentoService, TemplateOrcamentoService>();
+            services.AddScoped<IOrcamentoService, OrcamentoService>();
+            services.AddScoped<IHtmlToPdfConverter, PuppeteerHtmlToPdfConverter>();
+            services.AddScoped<IFilaEmailService, FilaEmailService>();
+            services.AddScoped<IEmailQueueSender, ResendEmailService>();
 
             // Repositories
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -61,6 +76,13 @@ namespace Budgets.Infrastructure.IoC
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IServicoRepository, ServicoRepository>();
             services.AddScoped<IFormaPagamentoRepository, FormaPagamentoRepository>();
+            services.AddScoped<ITemplateOrcamentoRepository, TemplateOrcamentoRepository>();
+            services.AddScoped<ITemplateOrcamentoMacroRepository, TemplateOrcamentoMacroRepository>();
+            services.AddScoped<IOrcamentoRepository, OrcamentoRepository>();
+            services.AddScoped<IOrcamentoFormaPagamentoRepository, OrcamentoFormaPagamentoRepository>();
+            services.AddScoped<IOrcamentoItemRepository, OrcamentoItemRepository>();
+            services.AddScoped<IFilaEmailRepository, FilaEmailRepository>();
+            services.AddScoped<IFilaEmailAnexoRepository, FilaEmailAnexoRepository>();
 
             return services;
 

@@ -80,10 +80,22 @@ export const HOME_ROUTES: Routes = [
       },
       {
         path: 'budgets',
-        loadComponent: () => import('./pages/placeholder/placeholder.page').then((m) => m.PlaceholderPage),
+        loadComponent: () =>
+          import('../budgets/pages/budget-list/budget-list.page').then((m) => m.BudgetListPage),
         data: {
           title: 'Orcamentos',
-          description: 'Espaco reservado para pipeline comercial e propostas.'
+          description: 'Crie, edite, visualize, baixe e envie os orcamentos da operacao.'
+        }
+      },
+      {
+        path: 'templates',
+        loadComponent: () =>
+          import('../templates/pages/template-orcamento-list/template-orcamento-list.page').then(
+            (m) => m.TemplateOrcamentoListPage
+          ),
+        data: {
+          title: 'Templates',
+          description: 'Crie e edite os modelos HTML usados nas propostas comerciais.'
         }
       },
       {

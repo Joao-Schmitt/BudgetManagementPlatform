@@ -68,6 +68,29 @@
 .sidebar__nav {
   display: grid;
   align-content: start;
+  gap: 0.9rem;
+}
+
+.sidebar__section,
+.sidebar__section-links {
+  display: grid;
+}
+
+.sidebar__section {
+  gap: 0.4rem;
+}
+
+.sidebar__section-title {
+  margin: 0;
+  padding-inline: 0.55rem;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar__section-links {
   gap: 0.18rem;
 }
 

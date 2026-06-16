@@ -1,31 +1,3 @@
-.auth-form {
-  display: grid;
-  gap: 1rem;
-}
+@use '../../styles/auth-surface' as auth-surface;
 
-header h2 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-header p {
-  margin: 0.35rem 0 0;
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
-}
-
-label {
-  display: grid;
-  gap: 0.4rem;
-}
-
-span {
-  font-size: 0.86rem;
-  font-weight: 600;
-}
-
-small {
-  color: var(--destructive);
-  font-size: 0.78rem;
-}
+@include auth-surface.auth-card-form();
