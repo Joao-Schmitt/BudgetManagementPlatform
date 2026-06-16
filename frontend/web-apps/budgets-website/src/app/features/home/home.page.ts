@@ -7,6 +7,7 @@ import {
   lucideBuilding2,
   lucideChevronDown,
   lucideCreditCard,
+  lucideFileText,
   lucideLayoutDashboard,
   lucideLogOut,
   lucideMenu,
@@ -36,6 +37,7 @@ type NavigationIcon =
   | 'lucideUsers'
   | 'lucideBuilding2'
   | 'lucideCreditCard'
+  | 'lucideFileText'
   | 'lucideBriefcaseBusiness'
   | 'lucidePackage'
   | 'lucideReceiptText'
@@ -45,6 +47,11 @@ interface NavigationItem {
   label: string;
   route: string;
   icon: NavigationIcon;
+}
+
+interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
 }
 
 @Component({
@@ -59,6 +66,7 @@ interface NavigationItem {
       lucideBuilding2,
       lucideChevronDown,
       lucideCreditCard,
+      lucideFileText,
       lucideLayoutDashboard,
       lucideLogOut,
       lucideMenu,
@@ -79,16 +87,26 @@ export class HomePage {
   private readonly routeTitleSignal = signal('Inicio');
   private readonly routeDescriptionSignal = signal('Visao geral dos indicadores e atalhos do workspace.');
 
-  protected readonly navigationItems: NavigationItem[] = [
-    { label: 'Inicio', route: '/home/overview', icon: 'lucideLayoutDashboard' },
-    { label: 'Clientes', route: '/home/customers', icon: 'lucideUsers' },
-    { label: 'Estabelecimentos', route: '/home/establishments', icon: 'lucideBuilding2' },
-    { label: 'Formas de pagamento', route: '/home/payment-methods', icon: 'lucideCreditCard' },
-    { label: 'Servicos', route: '/home/services', icon: 'lucideBriefcaseBusiness' },
-    { label: 'Vendedores', route: '/home/vendors', icon: 'lucideUsers' },
-    { label: 'Produtos', route: '/home/products', icon: 'lucidePackage' },
-    { label: 'Orcamentos', route: '/home/budgets', icon: 'lucideReceiptText' },
-    { label: 'Configuracoes', route: '/home/settings', icon: 'lucideSettings' }
+  protected readonly navigationSections: NavigationSection[] = [
+    {
+      title: 'Geracao',
+      items: [{ label: 'Orcamentos', route: '/home/budgets', icon: 'lucideReceiptText' }]
+    },
+    {
+      title: 'Cadastros',
+      items: [
+        { label: 'Clientes', route: '/home/customers', icon: 'lucideUsers' },
+        { label: 'Vendedores', route: '/home/vendors', icon: 'lucideUsers' },
+        { label: 'Produtos', route: '/home/products', icon: 'lucidePackage' },
+        { label: 'Servicos', route: '/home/services', icon: 'lucideBriefcaseBusiness' },
+        { label: 'Estabelecimentos', route: '/home/establishments', icon: 'lucideBuilding2' },
+        { label: 'Templates', route: '/home/templates', icon: 'lucideFileText' }
+      ]
+    },
+    {
+      title: 'Outros',
+      items: [{ label: 'Configuracoes', route: '/home/settings', icon: 'lucideSettings' }]
+    }
   ];
 
   protected readonly breadcrumbItems = computed(() => ['Budgets', this.routeTitleSignal()]);

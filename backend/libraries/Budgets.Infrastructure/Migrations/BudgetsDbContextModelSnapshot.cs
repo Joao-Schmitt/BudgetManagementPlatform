@@ -93,6 +93,68 @@ namespace Budgets.Infrastructure.Migrations
                     b.ToTable("Cliente", (string)null);
                 });
 
+            modelBuilder.Entity("Budgets.Domain.Email.Entities.FilaEmail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Assunto")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("AtualizadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Conteudo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Destinatario")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<int>("Situacao")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FilaEmail", (string)null);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Email.Entities.FilaEmailAnexo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Conteudo")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("FilaEmailId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NomeArquivo")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TipoConteudo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilaEmailId");
+
+                    b.ToTable("FilaEmailAnexo", (string)null);
+                });
+
             modelBuilder.Entity("Budgets.Domain.Estabelecimento.Entities.Estabelecimento", b =>
                 {
                     b.Property<Guid>("Id")
@@ -201,6 +263,113 @@ namespace Budgets.Infrastructure.Migrations
                     b.ToTable("FormaPagamento", (string)null);
                 });
 
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.Orcamento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("AtualizadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ClienteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EstabelecimentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TemplateOrcamentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VendedorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("EstabelecimentoId");
+
+                    b.HasIndex("TemplateOrcamentoId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("VendedorId");
+
+                    b.ToTable("Orcamento", (string)null);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.OrcamentoFormaPagamento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FormaPagamentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrcamentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormaPagamentoId");
+
+                    b.HasIndex("OrcamentoId");
+
+                    b.ToTable("OrcamentoFormaPagamento", (string)null);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.OrcamentoItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrcamentoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProdutoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Quantidade")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasDefaultValue(1m);
+
+                    b.Property<Guid?>("ServicoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ValorUnitario")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrcamentoId");
+
+                    b.HasIndex("ProdutoId");
+
+                    b.HasIndex("ServicoId");
+
+                    b.ToTable("OrcamentoItem", (string)null);
+                });
+
             modelBuilder.Entity("Budgets.Domain.Produto.Entities.Produto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -286,6 +455,58 @@ namespace Budgets.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Servico", (string)null);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Template.Entities.TemplateOrcamento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Html")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TemplateOrcamento", (string)null);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Template.Entities.TemplateOrcamentoMacro", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Macro")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TemplateOrcamentoMacro", (string)null);
                 });
 
             modelBuilder.Entity("Budgets.Domain.User.Entities.Usuario", b =>
@@ -404,6 +625,88 @@ namespace Budgets.Infrastructure.Migrations
                     b.ToTable("Vendedor", (string)null);
                 });
 
+            modelBuilder.Entity("Budgets.Domain.Email.Entities.FilaEmailAnexo", b =>
+                {
+                    b.HasOne("Budgets.Domain.Email.Entities.FilaEmail", "FilaEmail")
+                        .WithMany("Anexos")
+                        .HasForeignKey("FilaEmailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FilaEmail");
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.Orcamento", b =>
+                {
+                    b.HasOne("Budgets.Domain.Cliente.Entities.Cliente", null)
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.Estabelecimento.Entities.Estabelecimento", null)
+                        .WithMany()
+                        .HasForeignKey("EstabelecimentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.Template.Entities.TemplateOrcamento", null)
+                        .WithMany()
+                        .HasForeignKey("TemplateOrcamentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.User.Entities.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.Vendedor.Entities.Vendedor", null)
+                        .WithMany()
+                        .HasForeignKey("VendedorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.OrcamentoFormaPagamento", b =>
+                {
+                    b.HasOne("Budgets.Domain.FormaPagamento.Entities.FormaPagamento", null)
+                        .WithMany()
+                        .HasForeignKey("FormaPagamentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.Orcamento.Entities.Orcamento", "Orcamento")
+                        .WithMany("FormasPagamento")
+                        .HasForeignKey("OrcamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Orcamento");
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.OrcamentoItem", b =>
+                {
+                    b.HasOne("Budgets.Domain.Orcamento.Entities.Orcamento", "Orcamento")
+                        .WithMany("Itens")
+                        .HasForeignKey("OrcamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Budgets.Domain.Produto.Entities.Produto", null)
+                        .WithMany()
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Budgets.Domain.Servico.Entities.Servico", null)
+                        .WithMany()
+                        .HasForeignKey("ServicoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Orcamento");
+                });
+
             modelBuilder.Entity("Budgets.Domain.User.Entities.UsuarioRefreshToken", b =>
                 {
                     b.HasOne("Budgets.Domain.User.Entities.Usuario", null)
@@ -425,6 +728,18 @@ namespace Budgets.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Email.Entities.FilaEmail", b =>
+                {
+                    b.Navigation("Anexos");
+                });
+
+            modelBuilder.Entity("Budgets.Domain.Orcamento.Entities.Orcamento", b =>
+                {
+                    b.Navigation("FormasPagamento");
+
+                    b.Navigation("Itens");
                 });
 #pragma warning restore 612, 618
         }

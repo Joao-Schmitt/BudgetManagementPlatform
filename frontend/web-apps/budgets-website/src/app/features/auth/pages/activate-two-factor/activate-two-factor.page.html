@@ -1,28 +1,38 @@
 <app-auth-shell
   title="Ative uma segunda camada de confianca."
   description="Depois de criar sua conta, voce pode reforcar a seguranca com autenticacao de dois fatores antes do primeiro login oficial."
+  [wideLayout]="step() === 'setup'"
 >
-  <section class="activation-flow">
-    @if (errorMessage()) {
-      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
-    }
-
+  <section class="auth-panel activation-flow">
     @if (step() === 'question') {
-      <header>
+      <header class="auth-panel__header">
+        <div class="auth-panel__badge" aria-hidden="true">
+          <ng-icon name="lucideShieldCheck" class="size-4" />
+        </div>
         <h2>Deseja ativar a autenticacao de dois fatores?</h2>
         <p>Recomendamos ativar agora para proteger o acesso com um codigo temporario no aplicativo autenticador.</p>
       </header>
 
-      <div class="actions">
-        <button type="button" z-button [zLoading]="loadingSetup()" [disabled]="loadingSetup()" (click)="enableTwoFactor()">
+      <div class="actions-row">
+        <button
+          type="button"
+          z-button
+          class="submit-button"
+          [zLoading]="loadingSetup()"
+          [disabled]="loadingSetup()"
+          (click)="enableTwoFactor()"
+        >
           {{ loadingSetup() ? 'Preparando...' : 'Sim, ativar agora' }}
         </button>
-        <button type="button" z-button zType="outline" [disabled]="loadingSetup()" (click)="skip()">
+        <button type="button" z-button zType="outline" class="secondary-button" [disabled]="loadingSetup()" (click)="skip()">
           Agora nao
         </button>
       </div>
     } @else {
-      <header>
+      <header class="auth-panel__header">
+        <div class="auth-panel__badge" aria-hidden="true">
+          <ng-icon name="lucideQrCode" class="size-4" />
+        </div>
         <h2>Escaneie o QR code</h2>
         <p>Use Google Authenticator, Microsoft Authenticator ou outro app compativel com TOTP.</p>
       </header>
@@ -44,18 +54,17 @@
       </div>
 
       <form class="code-form" [formGroup]="form" (ngSubmit)="submitCode()">
-        <label>
+        <label class="field">
           <span>Codigo de verificacao</span>
-          <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" />
-          @if (hasCodeError('required')) {
-            <small>Informe o codigo atual do aplicativo.</small>
-          }
-          @if (hasCodeError('pattern')) {
-            <small>Use exatamente 6 digitos numericos.</small>
-          }
+          <div class="field__control">
+            <span class="field__icon" aria-hidden="true">
+              <ng-icon name="lucideLockKeyhole" class="size-4" />
+            </span>
+            <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" />
+          </div>
         </label>
 
-        <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
+        <button type="submit" z-button zFull class="submit-button" [zLoading]="submitting()" [disabled]="submitting()">
           {{ submitting() ? 'Confirmando...' : 'Confirmar autenticacao de dois fatores' }}
         </button>
       </form>

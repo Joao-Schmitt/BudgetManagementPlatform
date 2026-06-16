@@ -1,0 +1,34 @@
+<section class="template-page">
+  @if (errorMessage(); as message) {
+    <div class="feedback feedback--error" role="alert">{{ message }}</div>
+  }
+
+  <app-entity-grid
+    [eyebrow]="'Cadastro'"
+    [title]="'Templates de orcamento'"
+    [summary]="templateCountLabel()"
+    [loading]="loading()"
+    [columns]="gridColumns"
+    [rows]="gridRows()"
+    [busyRowId]="busyTemplateOrcamentoId()"
+    [emptyTitle]="'Nenhum template cadastrado'"
+    [emptyDescription]="'Comece adicionando o primeiro template para gerar propostas com mais velocidade.'"
+    addLabel="Adicionar"
+    viewLabel="Visualizar"
+    (add)="openCreateModal()"
+    (view)="viewTemplateOrcamento($event)"
+    (edit)="openEditModal($event.id)"
+    (duplicate)="openDuplicateModal($event.id)"
+    (delete)="deleteTemplateOrcamento($event)"
+  />
+
+  @if (modalState()) {
+    <app-template-orcamento-form-modal
+      [title]="modalTitle()"
+      [saving]="saving()"
+      [initialValue]="modalInitialValue()"
+      (close)="closeModal()"
+      (submitForm)="saveTemplateOrcamento($event)"
+    />
+  }
+</section>

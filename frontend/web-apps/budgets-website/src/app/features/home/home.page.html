@@ -28,21 +28,29 @@
     </div>
 
     <nav class="sidebar__nav" aria-label="Menu principal">
-      @for (item of navigationItems; track item.route) {
-        <a
-          [routerLink]="item.route"
-          routerLinkActive="is-active"
-          class="sidebar__link"
-          (click)="closeDrawer()"
-          [attr.aria-label]="item.label"
-          [attr.title]="null"
-        >
-          <span class="sidebar__icon" aria-hidden="true">
-            <ng-icon [name]="item.icon" class="size-4" />
-          </span>
+      @for (section of navigationSections; track section.title) {
+        <section class="sidebar__section" [attr.aria-label]="section.title">
+          <p class="sidebar__section-title">{{ section.title }}</p>
 
-          <span class="sidebar__label">{{ item.label }}</span>
-        </a>
+          <div class="sidebar__section-links">
+            @for (item of section.items; track item.route) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="is-active"
+                class="sidebar__link"
+                (click)="closeDrawer()"
+                [attr.aria-label]="item.label"
+                [attr.title]="null"
+              >
+                <span class="sidebar__icon" aria-hidden="true">
+                  <ng-icon [name]="item.icon" class="size-4" />
+                </span>
+
+                <span class="sidebar__label">{{ item.label }}</span>
+              </a>
+            }
+          </div>
+        </section>
       }
     </nav>
   </aside>

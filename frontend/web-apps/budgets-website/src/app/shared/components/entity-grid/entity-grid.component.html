@@ -34,9 +34,9 @@
           <thead z-table-header>
             <tr z-table-row>
               @for (column of columns(); track trackColumn($index, column)) {
-                <th z-table-head>{{ column.label }}</th>
+              <th z-table-head>{{ column.label }}</th>
               }
-              <th z-table-head class="w-40 text-right">Acoes</th>
+              <th z-table-head class="w-52 text-right">Acoes</th>
             </tr>
           </thead>
           <tbody z-table-body>
@@ -47,6 +47,48 @@
                 }
                 <td z-table-cell>
                   <div class="flex justify-end gap-1.5">
+                    @if (viewLabel()) {
+                      <button
+                        type="button"
+                        z-button
+                        zType="ghost"
+                        zSize="icon"
+                        [disabled]="isBusy(row.id)"
+                        (click)="view.emit(row.item)"
+                        aria-label="Visualizar registro"
+                        [attr.title]="viewLabel()"
+                      >
+                        <ng-icon name="lucideEye" class="size-4" aria-hidden="true" />
+                      </button>
+                    }
+                    @if (downloadLabel()) {
+                      <button
+                        type="button"
+                        z-button
+                        zType="ghost"
+                        zSize="icon"
+                        [disabled]="isBusy(row.id)"
+                        (click)="download.emit(row.item)"
+                        aria-label="Baixar arquivo"
+                        [attr.title]="downloadLabel()"
+                      >
+                        <ng-icon name="lucideDownload" class="size-4" aria-hidden="true" />
+                      </button>
+                    }
+                    @if (sendLabel()) {
+                      <button
+                        type="button"
+                        z-button
+                        zType="ghost"
+                        zSize="icon"
+                        [disabled]="isBusy(row.id)"
+                        (click)="send.emit(row.item)"
+                        aria-label="Enviar por e-mail"
+                        [attr.title]="sendLabel()"
+                      >
+                        <ng-icon name="lucideMail" class="size-4" aria-hidden="true" />
+                      </button>
+                    }
                     <button
                       type="button"
                       z-button
@@ -55,7 +97,7 @@
                       [disabled]="isBusy(row.id)"
                       (click)="edit.emit(row.item)"
                       aria-label="Editar registro"
-                      title="Editar registro"
+                      [attr.title]="'Editar registro'"
                     >
                       <ng-icon name="lucidePencil" class="size-4" aria-hidden="true" />
                     </button>

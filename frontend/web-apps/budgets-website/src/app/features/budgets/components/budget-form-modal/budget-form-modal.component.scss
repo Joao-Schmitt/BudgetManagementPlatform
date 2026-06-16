@@ -1,0 +1,152 @@
+:host {
+  display: block;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.modal-panel {
+  width: min(1100px, 100%);
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+  padding: 1.25rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-eyebrow,
+.items-section__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.modal-header h2,
+.items-section__header h3 {
+  margin: 0.35rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field span {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.field small,
+.items-section__error {
+  font-size: 0.76rem;
+  color: #b83232;
+}
+
+.field--full,
+.items-section {
+  grid-column: 1 / -1;
+}
+
+.items-section {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 0.25rem;
+}
+
+.items-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.items-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.item-card {
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.9rem;
+  background: hsl(var(--card));
+}
+
+.item-card__grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 160px minmax(0, 1fr) 140px 160px;
+  align-items: start;
+}
+
+.item-card__remove {
+  justify-self: end;
+}
+
+.field--grow {
+  min-width: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.35rem;
+}
+
+@media (max-width: 960px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-card__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-backdrop {
+    padding: 0.75rem;
+  }
+
+  .modal-panel {
+    max-height: calc(100vh - 1.5rem);
+    padding: 1rem;
+  }
+
+  .modal-header,
+  .items-section__header,
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

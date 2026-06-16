@@ -20,6 +20,8 @@ describe('SettingsPage', () => {
       'updateName',
       'updateEmail',
       'updatePassword',
+      'enableTwoFactor',
+      'confirmTwoFactor',
       'disableTwoFactor'
     ]);
     userSettingsService.updateName.and.returnValue(of({ id: '1', name: 'Ana Silva', email: 'ana@empresa.com' }));
@@ -58,6 +60,8 @@ describe('SettingsPage', () => {
       'updateName',
       'updateEmail',
       'updatePassword',
+      'enableTwoFactor',
+      'confirmTwoFactor',
       'disableTwoFactor'
     ]);
     userSettingsService.updateEmail.and.returnValues(
@@ -118,6 +122,8 @@ describe('SettingsPage', () => {
       'updateName',
       'updateEmail',
       'updatePassword',
+      'enableTwoFactor',
+      'confirmTwoFactor',
       'disableTwoFactor'
     ]);
     userSettingsService.disableTwoFactor.and.returnValue(of(void 0));
@@ -133,7 +139,7 @@ describe('SettingsPage', () => {
     const fixture = TestBed.createComponent(SettingsPage);
     const component = fixture.componentInstance;
 
-    component['requestDisableTwoFactor']();
+    component['toggleTwoFactor']();
 
     expect(component['pendingTwoFactorAction']()).toBe('disableTwoFactor');
     expect(userSettingsService.disableTwoFactor).not.toHaveBeenCalled();
@@ -147,6 +153,69 @@ describe('SettingsPage', () => {
       name: 'Ana',
       email: 'ana@empresa.com',
       twoFactorEnabled: false
+    });
+  });
+
+  it('should start setup and confirm through the backend before enabling 2FA locally', () => {
+    const authState = jasmine.createSpyObj<AuthStateService>(
+      'AuthStateService',
+      ['updateCurrentUser'],
+      {
+        currentUser: signal({
+          id: '1',
+          name: 'Ana',
+          email: 'ana@empresa.com',
+          twoFactorEnabled: false
+        }).asReadonly()
+      }
+    );
+    const userSettingsService = jasmine.createSpyObj<UserSettingsService>('UserSettingsService', [
+      'updateName',
+      'updateEmail',
+      'updatePassword',
+      'enableTwoFactor',
+      'confirmTwoFactor',
+      'disableTwoFactor'
+    ]);
+    userSettingsService.enableTwoFactor.and.returnValue(
+      of({ secret: 'ABC123', optAuthUrl: 'otpauth://totp/Budgets' })
+    );
+    userSettingsService.confirmTwoFactor.and.returnValue(
+      of({
+        id: '1',
+        name: 'Ana',
+        email: 'ana@empresa.com',
+        twoFactorEnabled: true
+      })
+    );
+
+    TestBed.configureTestingModule({
+      imports: [SettingsPage],
+      providers: [
+        { provide: AuthStateService, useValue: authState },
+        { provide: UserSettingsService, useValue: userSettingsService }
+      ]
+    });
+
+    const fixture = TestBed.createComponent(SettingsPage);
+    const component = fixture.componentInstance;
+    spyOn<any>(component, 'renderQrCode').and.returnValue(Promise.resolve());
+
+    component['toggleTwoFactor']();
+
+    expect(userSettingsService.enableTwoFactor).toHaveBeenCalled();
+    expect(component['pendingTwoFactorAction']()).toBe('enableTwoFactor');
+    expect(authState.updateCurrentUser).not.toHaveBeenCalled();
+
+    component['twoFactorForm'].setValue({ code: '123456' });
+    component['submitTwoFactor']();
+
+    expect(userSettingsService.confirmTwoFactor).toHaveBeenCalledWith('123456');
+    expect(authState.updateCurrentUser).toHaveBeenCalledWith({
+      id: '1',
+      name: 'Ana',
+      email: 'ana@empresa.com',
+      twoFactorEnabled: true
     });
   });
 });

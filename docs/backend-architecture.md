@@ -2,167 +2,229 @@
 
 ## Overview
 
-The backend is organized as a modular .NET solution for the ERP platform. The current structure separates runtime APIs from reusable libraries and keeps each business module isolated across Domain, Application, and Infrastructure projects.
+The backend is organized as a layered .NET solution for the Budgets platform. The current structure separates the executable API runtime from reusable libraries and keeps domain, application, infrastructure, shared abstractions, and dependency injection composition in distinct projects.
 
-This backend must be developed as a foundation-first modular architecture. New implementation should preserve the current folder structure, avoid premature business logic, and keep module boundaries explicit.
+New implementation should preserve the current folder structure, avoid premature business logic, and follow the patterns already used by the existing entities, services, repositories, configurations, and controllers.
 
 ## Solution Layout
 
 ```txt
 backend/
   libraries/
-    ERP.Shared/
-    ERP.Core.Domain/
-    ERP.Core.Application/
-    ERP.Core.Infrastructure/
-    ERP.Client.Domain/
-    ERP.Client.Application/
-    ERP.Client.Infrastructure/
-    ERP.Infrastructure.IoC/
+    Budgets.Shared/
+    Budgets.Domain/
+    Budgets.Application/
+    Budgets.Infrastructure/
+    Budgets.Infrastructure.IoC/
   runtimes/
-    ERP.Auth.Api/
-    ERP.Client.Api/
-    ERP.Gateway.Api/
+    Budgets.Api/
   tests/
+```
+
+The solution file lives at the repository root:
+
+```txt
+Budgets.sln
 ```
 
 ## Project Responsibilities
 
-### Runtime APIs
+### Runtime API
 
-`backend/runtimes` contains executable ASP.NET Core applications.
+`backend/runtimes/Budgets.Api` is the executable ASP.NET Core application.
 
-- `ERP.Auth.Api`: API runtime for Core/Auth module composition.
-- `ERP.Client.Api`: API runtime for Client module composition.
-- `ERP.Gateway.Api`: gateway runtime. It should not own persistence unless explicitly required later.
+Responsibilities:
 
-Runtime projects should be thin. They should configure hosting, middleware, controllers, OpenAPI, and call IoC extension methods. Business rules, persistence details, and module registrations should stay in the library projects.
+- Configure hosting, controllers, middleware, authentication, CORS, rate limiting, exception handling, health checks, and OpenAPI/API runtime concerns.
+- Expose controllers and runtime contracts.
+- Call the infrastructure composition extension from `Budgets.Infrastructure.IoC`.
+
+Runtime rules:
+
+- Keep `Program.cs` thin.
+- Do not access `BudgetsDbContext` directly from controllers.
+- Do not place business rules in controllers.
+- Do not register persistence and repository details directly in `Program.cs` when they belong in IoC.
 
 ### Shared
 
-`ERP.Shared` contains cross-module abstractions that are safe to share without creating module coupling.
+`Budgets.Shared` contains abstractions and simple cross-cutting types that can be safely shared without coupling one feature to another.
 
-Current responsibility:
+Current responsibilities include:
 
-- Shared persistence contracts such as `IUnitOfWork`.
+- Base abstractions such as `Entity`.
+- Persistence contracts such as `IRepository<TEntity>` and `IUnitOfWork`.
+- Result and security helper types.
 
-Shared should not contain module-specific business rules, concrete infrastructure implementations, or API concerns.
+Shared rules:
 
-### Domain Projects
+- Do not place feature-specific business rules in `Budgets.Shared`.
+- Do not place concrete infrastructure implementations in `Budgets.Shared`.
+- Do not add API runtime concerns to `Budgets.Shared`.
 
-Domain projects contain business entities, enums, value objects, and domain-only base types.
+### Domain
 
-- `ERP.Core.Domain`: Core/Auth domain.
-- `ERP.Client.Domain`: Client domain.
+`Budgets.Domain` contains domain entities and repository abstractions grouped by feature.
+
+Current examples:
+
+```txt
+Budgets.Domain/
+  Cliente/
+    Entities/
+    Interfaces/
+  Produto/
+    Entities/
+    Interfaces/
+  User/
+    Entities/
+    Interfaces/
+  Template/
+    Entites/
+    Interfaces/
+```
 
 Domain rules:
 
-- Domain must not reference Application, Infrastructure, APIs, EF Core, ASP.NET Core, or database packages.
-- Entities should inherit from the module's `Common.Entity` base when they need identity.
+- Domain must not reference Application, Infrastructure, runtime APIs, EF Core, ASP.NET Core, or database packages.
+- Entities that need identity should inherit from `Budgets.Shared.Abstractions.Entity`.
 - The default entity identifier is `Guid`.
+- Repository interfaces belong in the feature's `Interfaces` folder under `Budgets.Domain`.
 - Domain types should be public when used outside their assembly.
 - Keep domain logic independent from persistence and dependency injection.
+- Preserve existing folder names when adding to an existing feature. Some legacy folders are named `Entites`; do not rename folders as part of unrelated work.
 
-### Application Projects
+### Application
 
-Application projects contain use-case orchestration through Application Services, DTOs, mappings, validators, and application-level abstractions.
+`Budgets.Application` contains application services, DTOs/models, service interfaces, and use-case orchestration grouped by feature.
 
-- `ERP.Core.Application`: Core/Auth application layer.
-- `ERP.Client.Application`: Client application layer.
+Current examples:
+
+```txt
+Budgets.Application/
+  Cliente/
+    Interfaces/
+    Models/
+    Services/
+  Produto/
+    Interfaces/
+    Models/
+    Services/
+  Auth/
+    Interfaces/
+    Models/
+    Services/
+```
 
 Application rules:
 
 - Use Application Services as the main orchestration pattern.
-- Do not implement Command Handlers, Query Handlers, MediatR handlers, or CQRS handler classes in the current architecture.
-- Application Services may depend on application abstractions, repository interfaces, Unit of Work contracts, validators, and domain objects.
+- Application Services may depend on service interfaces, Domain repository interfaces, `IUnitOfWork`, validators/helpers, shared result types, and domain objects.
 - Application must not depend on concrete Infrastructure implementations.
-- DTOs, mappings, validators, and service contracts should stay inside the module folders already defined.
+- DTOs/models and service contracts should stay inside the feature folders already used by the project.
+- Do not add Command Handlers, Query Handlers, MediatR handlers, or CQRS handler classes to the current architecture unless the architecture is explicitly changed first.
 
-### Infrastructure Projects
+### Infrastructure
 
-Infrastructure projects contain persistence, repositories, Unit of Work implementations, EF Core contexts, migrations, configurations, and external technical integrations.
+`Budgets.Infrastructure` contains EF Core persistence, entity configurations, repository implementations, unit of work, migrations, and technical integrations.
 
-- `ERP.Core.Infrastructure`: Core/Auth infrastructure.
-- `ERP.Client.Infrastructure`: Client infrastructure.
+Current structure:
+
+```txt
+Budgets.Infrastructure/
+  Configurations/
+  Context/
+  Migrations/
+  Repositories/
+    Abstract/
+  Security/
+  UnitOfWork/
+```
 
 Infrastructure rules:
 
-- Each module has its own PostgreSQL database connection.
-- Each module has its own `DbContext`.
-- `DbContext` classes must not expose `DbSet` properties.
-- Repositories should use `DbContext.Set<TEntity>()` internally.
-- EF Core entity configurations belong in `Persistence/Configurations`.
-- Migrations belong in `Persistence/Migrations`.
-- Unit of Work implementations belong in `Persistence/UnitOfWork`.
-- Repository implementations and repository base classes belong in `Persistence/Repositories`.
+- The backend currently uses SQL Server through Entity Framework Core.
+- `BudgetsDbContext` belongs in `Budgets.Infrastructure.Context`.
+- `BudgetsDbContext` uses `ApplyConfigurationsFromAssembly(...)`.
+- `BudgetsDbContext` must not expose `DbSet<TEntity>` properties.
+- EF Core configurations belong in `Budgets.Infrastructure/Configurations`.
+- Repository implementations and repository base classes belong in `Budgets.Infrastructure/Repositories`.
+- Unit of Work implementation belongs in `Budgets.Infrastructure/UnitOfWork`.
+- Migrations belong in `Budgets.Infrastructure/Migrations`.
+- Repositories should use `DbContext.Set<TEntity>()` internally, usually through the shared base repository.
+- Avoid putting business rules inside repositories.
 
 ### Infrastructure IoC
 
-`ERP.Infrastructure.IoC` is responsible for dependency injection composition.
+`Budgets.Infrastructure.IoC` is responsible for dependency injection composition.
 
-It exposes module-level extension methods used by runtime APIs:
+Current extension method:
 
-- `AddCoreModule(...)`
-- `AddClientModule(...)`
-- `AddCoreApplication(...)`
-- `AddCoreInfrastructure(...)`
-- `AddClientApplication(...)`
-- `AddClientInfrastructure(...)`
-- `AddShared(...)`
+```csharp
+services.AddDependencyInjection(builder.Configuration);
+```
 
 IoC rules:
 
-- Register module dependencies in the module-specific extension methods.
-- Keep API `Program.cs` files small by delegating registrations to IoC.
-- Do not register command handlers or MediatR.
-- Register concrete Infrastructure implementations behind Application or Shared abstractions.
+- Register `BudgetsDbContext`, `IUnitOfWork`, application services, and repository implementations in `Budgets.Infrastructure.IoC`.
+- Keep concrete Infrastructure implementations behind Application, Domain, or Shared abstractions.
+- Keep `Budgets.Api` small by delegating service and persistence registration to IoC.
+- Do not register business command/query handlers or MediatR pipeline behavior in the current architecture.
 
 ## Persistence Model
 
-The backend uses PostgreSQL through Entity Framework Core.
+The backend uses SQL Server through Entity Framework Core.
 
-Database topology:
+Current database registration:
 
-- Core/Auth uses `CoreConnection`.
-- Client uses `ClientConnection`.
-- Gateway has no database connection by default.
+```csharp
+services.AddDbContext<BudgetsDbContext>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+```
 
 Context rules:
 
-- `CoreDbContext` belongs to `ERP.Core.Infrastructure`.
-- `ClientDbContext` belongs to `ERP.Client.Infrastructure`.
-- Context constructors receive `DbContextOptions<TContext>`.
-- Contexts use `ApplyConfigurationsFromAssembly(...)`.
-- Contexts must not expose `DbSet<TEntity>` properties.
+- `BudgetsDbContext` constructor receives `DbContextOptions<BudgetsDbContext>`.
+- `BudgetsDbContext` applies configurations with `ApplyConfigurationsFromAssembly(...)`.
+- `BudgetsDbContext` must not expose `DbSet<TEntity>` properties.
+
+Entity configuration rules:
+
+- Create one `IEntityTypeConfiguration<TEntity>` per mapped entity.
+- Use the table naming pattern already used by the project, such as `Cliente`, `Produto`, `UsuarioRefreshToken`, and `TemplateOrcamento`.
+- Map `Id` with `ValueGeneratedNever()` for entities that follow the existing `Guid` identity pattern.
+- Configure required fields, max lengths, precision, defaults, relationships, and ignored computed properties explicitly.
 
 Repository rules:
 
-- Repositories are module-specific.
-- Repositories should be abstracted through Application-layer interfaces when consumed by Application Services.
-- Concrete repository implementations belong in Infrastructure.
-- Base repository classes may provide structural persistence operations only.
-- Avoid putting business rules inside repositories.
+- Repository interfaces belong in `Budgets.Domain/<Feature>/Interfaces`.
+- Repository implementations belong in `Budgets.Infrastructure/Repositories`.
+- Repository implementations should inherit from `Repository<TEntity>` when the base operations are enough.
+- Add feature-specific repository methods only when the application layer needs them.
 
 Unit of Work rules:
 
 - Application Services should commit changes through `IUnitOfWork`.
-- Infrastructure provides module-specific implementations.
-- `CommitAsync` persists changes.
-- `RollbackAsync` clears pending tracked changes.
+- `Commit()` persists synchronously.
+- `CommitAsync(...)` persists asynchronously.
+- `RollbackAsync(...)` clears pending tracked changes through the EF Core change tracker.
 
 ## Development Guidelines
 
 ### Preserve the Current Structure
 
-Do not move, rename, or flatten the existing backend folders. New files should be added inside the folders already created for their responsibility.
+Do not move, rename, or flatten existing backend folders as part of ordinary feature work. New files should be added inside the folders already created for their responsibility.
 
 Examples:
 
-- New Core entity: `ERP.Core.Domain/Usuarios/Entities`.
-- New Client entity: `ERP.Client.Domain/Clientes/Entities`.
-- New Core validator: `ERP.Core.Application/Modules/Auth/Validators`.
-- New Client service: `ERP.Client.Application/Modules/Clientes/Services`.
-- New EF configuration: the module Infrastructure `Persistence/Configurations`.
+- New entity: `backend/libraries/Budgets.Domain/<Feature>/Entities` or the existing feature folder name.
+- New repository interface: `backend/libraries/Budgets.Domain/<Feature>/Interfaces`.
+- New application service interface: `backend/libraries/Budgets.Application/<Feature>/Interfaces`.
+- New application service implementation: `backend/libraries/Budgets.Application/<Feature>/Services`.
+- New application model/DTO: `backend/libraries/Budgets.Application/<Feature>/Models`.
+- New EF configuration: `backend/libraries/Budgets.Infrastructure/Configurations`.
+- New repository implementation: `backend/libraries/Budgets.Infrastructure/Repositories`.
+- New controller: `backend/runtimes/Budgets.Api/Controllers`.
 
 ### Use Application Services
 
@@ -173,24 +235,26 @@ Expected flow:
 ```txt
 Controller
   -> Application Service
-    -> Repository abstraction
+    -> Domain repository interface
     -> Domain entity/value object
     -> Unit of Work
 ```
 
-Controllers should not call `DbContext` directly. Controllers should not contain business rules.
+Controllers should translate HTTP requests/responses and delegate business orchestration to Application Services.
 
-### Do Not Add Handlers
+### Do Not Add Business Handlers
 
 The current architecture intentionally avoids:
 
-- Command classes
-- Query classes
-- Command handlers
-- Query handlers
-- MediatR pipeline behavior
+- Command classes.
+- Query classes.
+- Command handlers.
+- Query handlers.
+- MediatR pipeline behavior.
 
-If a future requirement introduces CQRS, it should be discussed and documented before changing this rule.
+The runtime may still contain technical handlers such as `GlobalExceptionHandler`; this does not change the application architecture.
+
+If a future requirement introduces CQRS or MediatR, discuss and document the architecture change before implementation.
 
 ### Keep DbSet Out of DbContext
 
@@ -203,58 +267,65 @@ public DbSet<User> Users { get; set; }
 Use repository methods backed by:
 
 ```csharp
-Context.Set<TEntity>()
+context.Set<TEntity>()
 ```
 
 This keeps persistence access centralized in repositories and avoids leaking entity sets through the context.
 
-### Keep Module Boundaries Clear
+### Add Features Gradually
 
-Core/Auth and Client are separate modules.
-
-- Core code should not depend on Client-specific types.
-- Client code should not depend on Core-specific types unless a future shared contract is intentionally introduced.
-- Shared abstractions must remain generic and module-neutral.
-
-### Add Logic Gradually
-
-When adding real features, implement in this order:
+For a full backend feature, implement in this order:
 
 1. Domain entity/value object/enum.
-2. EF Core configuration.
-3. Repository abstraction in Application.
-4. Repository implementation in Infrastructure.
-5. Application Service interface and implementation.
-6. Validator and DTOs if needed.
-7. Controller endpoint.
-8. Tests.
+2. Domain repository interface.
+3. EF Core configuration.
+4. Repository implementation.
+5. Application model/DTO.
+6. Application service interface.
+7. Application service implementation.
+8. IoC registration.
+9. Controller endpoint.
+10. Tests when behavior or risk justifies coverage.
+11. Migration only when requested or when schema changes are ready to be persisted.
 
-Do not create migrations until the related entity mappings are ready.
+For structural-only requests, such as "create repository, interfaces, configurations", do only the requested lower-layer files and IoC registration.
 
 ## Validation Checklist
 
 Before finishing backend structural changes, run:
 
 ```powershell
-dotnet restore ERP.sln
-dotnet build ERP.sln --no-restore
+dotnet restore Budgets.sln
+dotnet build Budgets.sln --no-restore
+```
+
+If the API is running in Visual Studio and build outputs are locked, validate with an alternate output path:
+
+```powershell
+dotnet build backend/runtimes/Budgets.Api/Budgets.Api.csproj -p:BaseOutputPath=C:\Projects\BudgetManagementPlatform\.tmp\build-verify\
 ```
 
 Also verify:
 
-- No `DbSet` properties were added to DbContexts.
-- No Command Handlers or Query Handlers were created.
+- No `DbSet` properties were added to `BudgetsDbContext`.
+- No business Command Handlers or Query Handlers were created.
 - No MediatR dependency was introduced.
-- APIs still use IoC extension methods for module registration.
+- `Budgets.Api` still delegates dependency registration to `Budgets.Infrastructure.IoC`.
 - New files remain inside the current folder structure.
+- Repository interfaces remain in Domain, not Infrastructure.
+- Repository implementations remain in Infrastructure, not Application.
 
 ## Current Architectural Defaults
 
 - Target framework: `.NET 10`.
-- Database: PostgreSQL.
+- Database: SQL Server.
+- EF Core provider: `Microsoft.EntityFrameworkCore.SqlServer`.
+- Connection string name: `DefaultConnection`.
 - Entity identifier: `Guid`.
-- Module persistence: separated by physical database connection.
-- Composition root: `ERP.Infrastructure.IoC`.
+- Runtime API: `Budgets.Api`.
+- Composition root: `Budgets.Infrastructure.IoC`.
+- Dependency injection extension: `AddDependencyInjection(...)`.
 - Business orchestration: Application Services.
-- Repository access: abstract repositories, with concrete persistence in Infrastructure.
-- DbContext exposure: no `DbSet` properties.
+- Repository abstractions: Domain interfaces.
+- Repository implementations: Infrastructure classes.
+- DbContext exposure: no `DbSet<TEntity>` properties.

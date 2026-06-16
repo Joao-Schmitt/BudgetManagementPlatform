@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.9" />
+    <PackageReference Include="PuppeteerSharp" Version="25.1.1" />
+    <PackageReference Include="Resend" Version="0.5.1" />
   </ItemGroup>
 
   <ItemGroup>

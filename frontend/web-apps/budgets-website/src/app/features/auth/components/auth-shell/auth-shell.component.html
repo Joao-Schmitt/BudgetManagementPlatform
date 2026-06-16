@@ -1,18 +1,67 @@
-<section class="auth-shell">
-  <div class="brand-panel">
-    <p class="eyebrow">{{ eyebrow() }}</p>
-    <h1>{{ title() }}</h1>
-    <p class="description">{{ description() }}</p>
+<section class="auth-shell" [class.auth-shell--wide]="wideLayout()">
+  <div class="auth-shell__glow auth-shell__glow--top" aria-hidden="true"></div>
+  <div class="auth-shell__glow auth-shell__glow--bottom" aria-hidden="true"></div>
+
+  <section class="brand-column" aria-label="Apresentacao do Budgets">
+    <div class="brand-column__top">
+      <a class="brand-mark" routerLink="/login" aria-label="Budgets">
+        <span class="brand-mark__symbol">B</span>
+        <span class="brand-mark__text">Budgets</span>
+      </a>
+
+      <div class="brand-copy">
+        <p class="brand-copy__eyebrow">{{ eyebrow() }}</p>
+        <h1>{{ title() }}</h1>
+        <p class="brand-copy__description">{{ description() }}</p>
+      </div>
+
+      <div class="benefit-list" aria-label="Beneficios do Budgets">
+        <div class="benefit-item">
+          <span class="benefit-item__icon" aria-hidden="true">
+            <ng-icon name="lucideShieldCheck" class="size-4" />
+          </span>
+          <div class="benefit-item__body">
+            <strong>Seguranca em primeiro lugar</strong>
+            <span>Conta protegida e fluxo preparado para autenticar com confianca.</span>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <span class="benefit-item__icon" aria-hidden="true">
+            <ng-icon name="lucideChartColumn" class="size-4" />
+          </span>
+          <div class="benefit-item__body">
+            <strong>Gestao completa</strong>
+            <span>Organize clientes, produtos, templates e orcamentos em um lugar so.</span>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <span class="benefit-item__icon" aria-hidden="true">
+            <ng-icon name="lucideUsers" class="size-4" />
+          </span>
+          <div class="benefit-item__body">
+            <strong>Feito para times comerciais</strong>
+            <span>Fluxo rapido para quem precisa vender, revisar e enviar mais.</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     @if (alternateLabel() && alternateLink() && alternateText()) {
-      <p class="alternate">
-        {{ alternateLabel() }}
-        <a [routerLink]="alternateLink()">{{ alternateText() }}</a>
-      </p>
+      <div class="brand-footer">
+        <span>{{ alternateLabel() }}</span>
+        <a [routerLink]="alternateLink()">
+          {{ alternateText() }}
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
     }
-  </div>
+  </section>
 
-  <z-card class="auth-card">
-    <ng-content />
-  </z-card>
+  <section class="form-column">
+    <z-card class="auth-card" [class.auth-card--wide]="wideLayout()">
+      <ng-content />
+    </z-card>
+  </section>
 </section>

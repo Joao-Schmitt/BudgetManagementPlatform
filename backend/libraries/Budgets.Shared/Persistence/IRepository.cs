@@ -10,6 +10,7 @@ namespace Budgets.Shared.Persistence
     public interface IRepository<TEntity> : IDisposable where TEntity : class
     {
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool readOnly = false);
+        IQueryable<TEntity> GetAll();
         IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate, bool readOnly = false);
         Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, bool readOnly = false);
         TEntity GetById(Guid id);

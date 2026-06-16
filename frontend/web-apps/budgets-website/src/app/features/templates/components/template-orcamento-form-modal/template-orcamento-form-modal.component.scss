@@ -1,0 +1,246 @@
+:host {
+  display: contents;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: oklch(0.145 0 0 / 18%);
+}
+
+.modal-panel {
+  width: min(100%, 76rem);
+  max-height: min(90vh, 52rem);
+  overflow: auto;
+  padding: 1rem;
+}
+
+.modal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.modal-header,
+.modal-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.modal-header {
+  margin-bottom: 1rem;
+}
+
+.modal-eyebrow {
+  margin: 0 0 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.38rem;
+}
+
+.field--wide {
+  grid-column: span 6;
+}
+
+.field--full {
+  grid-column: 1 / -1;
+}
+
+.field span {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+textarea {
+  min-height: 18rem;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+.macro-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  background: var(--muted);
+}
+
+.macro-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.macro-panel__eyebrow {
+  margin: 0 0 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.macro-panel h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.macro-panel__description {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.macro-panel__content {
+  min-height: 18rem;
+}
+
+.macro-list,
+.macro-skeletons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.macro-list {
+  max-height: 30rem;
+  overflow: auto;
+  padding-right: 0.15rem;
+}
+
+.macro-item,
+.macro-error,
+.macro-empty {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--background);
+}
+
+.macro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem;
+}
+
+.macro-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.macro-item__badge {
+  max-width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  text-transform: none;
+}
+
+.macro-item__description {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.macro-error {
+  padding: 0.9rem;
+  color: var(--muted-foreground);
+  font-size: 0.88rem;
+}
+
+.macro-empty {
+  padding: 0.5rem;
+}
+
+.macro-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--background);
+}
+
+.macro-skeleton__tag {
+  width: 7.5rem;
+  height: 1.15rem;
+}
+
+.macro-skeleton__line {
+  width: 100%;
+  height: 0.8rem;
+}
+
+.macro-skeleton__line--short {
+  width: 72%;
+}
+
+small {
+  color: var(--destructive);
+  font-size: 0.72rem;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  padding-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .modal-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .field--wide,
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  .macro-list {
+    max-height: none;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}

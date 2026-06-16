@@ -5,33 +5,29 @@
   alternateLink="/login"
   alternateText="Retornar ao login"
 >
-  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-    <header>
+  <section class="auth-panel">
+    <header class="auth-panel__header">
+      <div class="auth-panel__badge" aria-hidden="true">
+        <ng-icon name="lucideShieldCheck" class="size-4" />
+      </div>
       <h2>Codigo de verificacao</h2>
       <p>Informe os 6 digitos exibidos no aplicativo autenticador.</p>
     </header>
 
-    @if (noticeMessage()) {
-      <z-alert [zDescription]="noticeMessage() ?? ''" />
-    }
-
-    @if (errorMessage()) {
-      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
-    }
-
-    <label>
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
       <span>Codigo</span>
-      <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" />
-      @if (hasCodeError('required')) {
-        <small>Informe o codigo.</small>
-      }
-      @if (hasCodeError('pattern')) {
-        <small>Use exatamente 6 digitos numericos.</small>
-      }
+      <div class="field__control">
+        <span class="field__icon" aria-hidden="true">
+          <ng-icon name="lucideLockKeyhole" class="size-4" />
+        </span>
+        <input z-input type="text" inputmode="numeric" formControlName="code" placeholder="000000" maxlength="6" />
+      </div>
     </label>
 
-    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
-      {{ submitting() ? 'Validando...' : 'Confirmar e entrar' }}
-    </button>
-  </form>
+      <button type="submit" z-button zFull class="submit-button" [zLoading]="submitting()" [disabled]="submitting()">
+        {{ submitting() ? 'Validando...' : 'Confirmar e entrar' }}
+      </button>
+    </form>
+  </section>
 </app-auth-shell>

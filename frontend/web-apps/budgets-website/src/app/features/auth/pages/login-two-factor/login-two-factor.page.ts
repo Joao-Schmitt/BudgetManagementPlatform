@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLockKeyhole, lucideShieldCheck } from '@ng-icons/lucide';
 
-import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
+import { ToastService } from '@/shared/components/toast';
 
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { AuthShellComponent } from '../../components/auth-shell/auth-shell.component';
@@ -14,18 +16,23 @@ import { AuthShellComponent } from '../../components/auth-shell/auth-shell.compo
 @Component({
   selector: 'app-login-two-factor-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, AuthShellComponent, ZardAlertComponent, ZardButtonComponent, ZardInputDirective],
+  imports: [CommonModule, ReactiveFormsModule, AuthShellComponent, NgIcon, ZardButtonComponent, ZardInputDirective],
   templateUrl: './login-two-factor.page.html',
-  styleUrl: './login-two-factor.page.scss'
+  styleUrl: './login-two-factor.page.scss',
+  viewProviders: [
+    provideIcons({
+      lucideLockKeyhole,
+      lucideShieldCheck,
+    }),
+  ],
 })
 export class LoginTwoFactorPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authState = inject(AuthStateService);
+  private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
-  protected readonly errorMessage = signal<string | null>(null);
-  protected readonly noticeMessage = signal<string | null>(this.authState.consumeNotice());
   protected readonly submitting = signal(false);
 
   protected readonly form = this.formBuilder.nonNullable.group({
@@ -33,6 +40,13 @@ export class LoginTwoFactorPage {
   });
 
   constructor() {
+    const notice = this.authState.consumeNotice();
+    if (notice) {
+      queueMicrotask(() => {
+        this.toastService.primary('Continue a verificacao', notice);
+      });
+    }
+
     if (!this.authState.twoFactorToken()) {
       this.authState.setNotice('Sua etapa de autenticacao expirou. Entre novamente.');
       void this.router.navigate(['/login']);
@@ -42,11 +56,10 @@ export class LoginTwoFactorPage {
   submit(): void {
     if (this.form.invalid || this.submitting()) {
       this.form.markAllAsTouched();
+      this.showValidationToast();
       return;
     }
 
-    this.errorMessage.set(null);
-    this.noticeMessage.set(null);
     this.submitting.set(true);
 
     this.authState
@@ -56,14 +69,20 @@ export class LoginTwoFactorPage {
         next: () => this.submitting.set(false),
         error: (error: unknown) => {
           this.submitting.set(false);
-          this.errorMessage.set(this.extractErrorMessage(error));
+          this.toastService.danger('Codigo invalido', this.extractErrorMessage(error));
         }
       });
   }
 
-  protected hasCodeError(errorName: string): boolean {
-    const control = this.form.controls.code;
-    return control.touched && control.hasError(errorName);
+  private showValidationToast(): void {
+    if (this.form.controls.code.hasError('required')) {
+      this.toastService.warning('Informe o codigo', 'Digite o codigo de 6 digitos do autenticador.');
+      return;
+    }
+
+    if (this.form.controls.code.hasError('pattern')) {
+      this.toastService.warning('Codigo invalido', 'Use exatamente 6 digitos numericos.');
+    }
   }
 
   private extractErrorMessage(error: unknown): string {

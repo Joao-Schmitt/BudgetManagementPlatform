@@ -4,7 +4,17 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideLockKeyhole, lucideMail, lucideShieldCheck, lucideUserRound, lucideX } from '@ng-icons/lucide';
+import {
+  lucideEye,
+  lucideEyeOff,
+  lucideLockKeyhole,
+  lucideMail,
+  lucideSave,
+  lucideShieldCheck,
+  lucideUserRound,
+  lucideX
+} from '@ng-icons/lucide';
+import QRCode from 'qrcode';
 
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
@@ -14,13 +24,14 @@ import { ZardInputDirective } from '@/shared/components/input/input.directive';
 
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import {
+  EnableTwoFactorResponse,
   UpdateUserEmailRequest,
   UpdateUserPasswordRequest,
   UserProfile
 } from '../../models/user-settings.model';
 import { UserSettingsService } from '../../services/user-settings.service';
 
-type PendingTwoFactorAction = 'email' | 'password' | 'disableTwoFactor';
+type PendingTwoFactorAction = 'email' | 'password' | 'enableTwoFactor' | 'disableTwoFactor';
 type PasswordControlName = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
 @Component({
@@ -40,8 +51,11 @@ type PasswordControlName = 'currentPassword' | 'newPassword' | 'confirmPassword'
   styleUrl: './settings.page.scss',
   viewProviders: [
     provideIcons({
+      lucideEye,
+      lucideEyeOff,
       lucideLockKeyhole,
       lucideMail,
+      lucideSave,
       lucideShieldCheck,
       lucideUserRound,
       lucideX
@@ -64,9 +78,16 @@ export class SettingsPage {
   protected readonly savingName = signal(false);
   protected readonly savingEmail = signal(false);
   protected readonly savingPassword = signal(false);
+  protected readonly enablingTwoFactor = signal(false);
   protected readonly disablingTwoFactor = signal(false);
   protected readonly submittingTwoFactor = signal(false);
   protected readonly pendingTwoFactorAction = signal<PendingTwoFactorAction | null>(null);
+  protected readonly twoFactorSetupData = signal<EnableTwoFactorResponse | null>(null);
+  protected readonly qrCodeDataUrl = signal<string | null>(null);
+  protected readonly showCurrentPassword = signal(false);
+  protected readonly showNewPassword = signal(false);
+  protected readonly showConfirmPassword = signal(false);
+  private readonly newPasswordValue = signal('');
   private pendingEmailRequest: UpdateUserEmailRequest | null = null;
   private pendingPasswordRequest: UpdateUserPasswordRequest | null = null;
 
@@ -92,6 +113,8 @@ export class SettingsPage {
     switch (this.pendingTwoFactorAction()) {
       case 'email':
         return 'Confirme a alteracao de e-mail';
+      case 'enableTwoFactor':
+        return 'Confirme a ativacao do 2FA';
       case 'disableTwoFactor':
         return 'Confirme a desativacao do 2FA';
       default:
@@ -100,6 +123,18 @@ export class SettingsPage {
   });
 
   protected readonly isTwoFactorEnabled = computed(() => this.currentUser()?.twoFactorEnabled === true);
+  protected readonly twoFactorSwitchDisabled = computed(
+    () => this.enablingTwoFactor() || this.disablingTwoFactor() || this.submittingTwoFactor()
+  );
+  protected readonly passwordStrength = computed(() => this.evaluatePasswordStrength(this.newPasswordValue()));
+
+  constructor() {
+    this.passwordForm.controls.newPassword.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) => {
+        this.newPasswordValue.set(value ?? '');
+      });
+  }
 
   protected saveName(): void {
     if (this.nameForm.invalid || this.savingName()) {
@@ -170,11 +205,46 @@ export class SettingsPage {
     });
   }
 
-  protected requestDisableTwoFactor(): void {
-    if (!this.isTwoFactorEnabled() || this.disablingTwoFactor()) {
+  protected toggleTwoFactor(): void {
+    if (this.twoFactorSwitchDisabled()) {
       return;
     }
 
+    if (this.isTwoFactorEnabled()) {
+      this.requestDisableTwoFactor();
+      return;
+    }
+
+    this.requestEnableTwoFactor();
+  }
+
+  private requestEnableTwoFactor(): void {
+    this.securityError.set(null);
+    this.successMessage.set(null);
+    this.twoFactorError.set(null);
+    this.twoFactorSetupData.set(null);
+    this.qrCodeDataUrl.set(null);
+    this.enablingTwoFactor.set(true);
+
+    this.userSettingsService
+      .enableTwoFactor()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.enablingTwoFactor.set(false);
+          this.twoFactorSetupData.set(response);
+          this.pendingTwoFactorAction.set('enableTwoFactor');
+          this.twoFactorForm.reset({ code: '' });
+          void this.renderQrCode(response.optAuthUrl);
+        },
+        error: (error: unknown) => {
+          this.enablingTwoFactor.set(false);
+          this.securityError.set(this.extractErrorMessage(error));
+        }
+      });
+  }
+
+  private requestDisableTwoFactor(): void {
     this.securityError.set(null);
     this.successMessage.set(null);
     this.pendingTwoFactorAction.set('disableTwoFactor');
@@ -203,6 +273,11 @@ export class SettingsPage {
       return;
     }
 
+    if (action === 'enableTwoFactor') {
+      this.confirmEnableTwoFactor(code);
+      return;
+    }
+
     if (action === 'disableTwoFactor') {
       this.disableTwoFactor(code);
       return;
@@ -216,9 +291,36 @@ export class SettingsPage {
     this.pendingTwoFactorAction.set(null);
     this.pendingEmailRequest = null;
     this.pendingPasswordRequest = null;
+    this.enablingTwoFactor.set(false);
     this.disablingTwoFactor.set(false);
+    this.twoFactorSetupData.set(null);
+    this.qrCodeDataUrl.set(null);
     this.twoFactorError.set(null);
     this.twoFactorForm.reset({ code: '' });
+  }
+
+  protected togglePasswordVisibility(controlName: PasswordControlName): void {
+    switch (controlName) {
+      case 'currentPassword':
+        this.showCurrentPassword.update((current) => !current);
+        return;
+      case 'newPassword':
+        this.showNewPassword.update((current) => !current);
+        return;
+      default:
+        this.showConfirmPassword.update((current) => !current);
+    }
+  }
+
+  protected passwordInputType(controlName: PasswordControlName): 'password' | 'text' {
+    switch (controlName) {
+      case 'currentPassword':
+        return this.showCurrentPassword() ? 'text' : 'password';
+      case 'newPassword':
+        return this.showNewPassword() ? 'text' : 'password';
+      default:
+        return this.showConfirmPassword() ? 'text' : 'password';
+    }
   }
 
   protected hasNameError(errorName: string): boolean {
@@ -308,6 +410,37 @@ export class SettingsPage {
       });
   }
 
+  private confirmEnableTwoFactor(code: string): void {
+    this.enablingTwoFactor.set(true);
+
+    this.userSettingsService
+      .confirmTwoFactor(code)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.submittingTwoFactor.set(false);
+          this.enablingTwoFactor.set(false);
+
+          if (user) {
+            this.applyUpdatedUser({
+              ...user,
+              twoFactorEnabled: true
+            });
+          } else {
+            this.applyTwoFactorEnabled(true);
+          }
+
+          this.closeTwoFactorDialog();
+          this.successMessage.set('Autenticacao de dois fatores ativada com sucesso.');
+        },
+        error: (error: unknown) => {
+          this.submittingTwoFactor.set(false);
+          this.enablingTwoFactor.set(false);
+          this.twoFactorError.set(this.extractErrorMessage(error));
+        }
+      });
+  }
+
   private handleSecureActionError(
     action: PendingTwoFactorAction,
     request: UpdateUserEmailRequest | UpdateUserPasswordRequest,
@@ -387,6 +520,24 @@ export class SettingsPage {
     );
   }
 
+  private async renderQrCode(otpAuthUrl: string): Promise<void> {
+    try {
+      const dataUrl = await QRCode.toDataURL(otpAuthUrl, {
+        margin: 1,
+        width: 220,
+        color: {
+          dark: '#0c141d',
+          light: '#ffffff'
+        }
+      });
+
+      this.qrCodeDataUrl.set(dataUrl);
+    } catch {
+      this.qrCodeDataUrl.set(null);
+      this.twoFactorError.set('Nao foi possivel renderizar o QR code. Use o codigo secreto abaixo.');
+    }
+  }
+
   private extractErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const apiError = error.error;
@@ -409,5 +560,39 @@ export class SettingsPage {
     }
 
     return 'Nao foi possivel salvar a alteracao agora. Tente novamente.';
+  }
+
+  private evaluatePasswordStrength(password: string): { label: string; score: number } {
+    if (!password) {
+      return { label: 'Fraca', score: 0 };
+    }
+
+    let score = 0;
+
+    if (password.length >= 8) {
+      score += 1;
+    }
+
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) {
+      score += 1;
+    }
+
+    if (/\d/.test(password)) {
+      score += 1;
+    }
+
+    if (/[^A-Za-z0-9]/.test(password)) {
+      score += 1;
+    }
+
+    if (score <= 1) {
+      return { label: 'Fraca', score: 1 };
+    }
+
+    if (score <= 3) {
+      return { label: 'Media', score: 2 };
+    }
+
+    return { label: 'Forte', score: 4 };
   }
 }

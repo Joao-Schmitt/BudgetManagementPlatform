@@ -1,45 +1,136 @@
-<app-auth-shell
-  title="Sua operacao comeca aqui."
-  description="Entre na plataforma para gerenciar orcamentos, clientes e o fluxo comercial com seguranca."
-  alternateLabel="Ainda nao tem conta?"
-  alternateLink="/create-account"
-  alternateText="Criar conta"
->
-  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-    <header>
-      <h2>Entrar</h2>
-      <p>Use o e-mail cadastrado e sua senha.</p>
-    </header>
+<section class="login-page">
+  <div class="login-shell">
+    <div class="login-shell__glow login-shell__glow--top" aria-hidden="true"></div>
+    <div class="login-shell__glow login-shell__glow--bottom" aria-hidden="true"></div>
 
-    @if (noticeMessage()) {
-      <z-alert [zDescription]="noticeMessage() ?? ''" />
-    }
+    <section class="brand-column" aria-label="Apresentacao do Budgets">
+      <div class="brand-column__top">
+        <a class="brand-mark" routerLink="/login" aria-label="Budgets">
+          <span class="brand-mark__symbol">B</span>
+          <span class="brand-mark__text">Budgets</span>
+        </a>
 
-    @if (errorMessage()) {
-      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
-    }
+        <div class="brand-copy">
+          <p class="brand-copy__eyebrow">Plataforma comercial</p>
+          <h1 class="brand-copy__title">
+            SUA OPERAÇÃO COMEÇA
+            <span class="brand-copy__accent">AQUI!</span>
+          </h1>
+          <p class="brand-copy__description">
+            Centralize clientes, propostas e orcamentos com uma operacao comercial mais clara e segura.
+          </p>
+        </div>
 
-    <label>
-      <span>E-mail</span>
-      <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" />
-      @if (hasError('email', 'required')) {
-        <small>Informe o e-mail.</small>
-      }
-      @if (hasError('email', 'email')) {
-        <small>Digite um e-mail valido.</small>
-      }
-    </label>
+        <div class="benefit-list" aria-label="Beneficios do Budgets">
+          <div class="benefit-item">
+            <span class="benefit-item__icon" aria-hidden="true">
+              <ng-icon name="lucideShieldCheck" class="size-4" />
+            </span>
+            <div class="benefit-item__body">
+              <strong>Seguranca em primeiro lugar</strong>
+              <span>Conta protegida e fluxo preparado para autenticar com confiança.</span>
+            </div>
+          </div>
 
-    <label>
-      <span>Senha</span>
-      <input z-input type="password" formControlName="password" placeholder="Sua senha" />
-      @if (hasError('password', 'required')) {
-        <small>Informe a senha.</small>
-      }
-    </label>
+          <div class="benefit-item">
+            <span class="benefit-item__icon" aria-hidden="true">
+              <ng-icon name="lucideChartColumn" class="size-4" />
+            </span>
+            <div class="benefit-item__body">
+              <strong>Gestao completa</strong>
+              <span>Organize clientes, produtos, templates e orcamentos em um lugar so.</span>
+            </div>
+          </div>
 
-    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
-      {{ submitting() ? 'Entrando...' : 'Entrar' }}
-    </button>
-  </form>
-</app-auth-shell>
+          <div class="benefit-item">
+            <span class="benefit-item__icon" aria-hidden="true">
+              <ng-icon name="lucideUsers" class="size-4" />
+            </span>
+            <div class="benefit-item__body">
+              <strong>Feito para times comerciais</strong>
+              <span>Fluxo rapido para quem precisa vender, revisar e enviar mais.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-footer">
+        <span>Ainda não tem conta?</span>
+        <a routerLink="/create-account">Criar conta <span aria-hidden="true">→</span></a>
+      </div>
+
+    </section>
+
+    <section class="form-column" aria-label="Entrar no Budgets">
+      <div class="login-card">
+        <header class="login-card__header">
+          <h2>Entrar</h2>
+          <p>Use o e-mail cadastrado e sua senha.</p>
+        </header>
+
+        <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+          <label class="field">
+            <span>E-mail</span>
+            <div class="field__control">
+              <span class="field__icon" aria-hidden="true">
+                <ng-icon name="lucideMail" class="size-4" />
+              </span>
+              <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" autocomplete="email" />
+            </div>
+          </label>
+
+          <label class="field">
+            <span>Senha</span>
+            <div class="field__control">
+              <span class="field__icon" aria-hidden="true">
+                <ng-icon name="lucideLockKeyhole" class="size-4" />
+              </span>
+              <input
+                z-input
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Sua senha"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="field__action"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
+                [attr.title]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
+              >
+                <ng-icon [name]="showPassword() ? 'lucideEyeOff' : 'lucideEye'" class="size-4" />
+              </button>
+            </div>
+          </label>
+
+          <div class="auth-form__meta">
+            <label class="remember-choice">
+              <input type="checkbox" />
+              <span>Lembrar de mim</span>
+            </label>
+
+            <button type="button" class="meta-link" aria-disabled="true">
+              Esqueci minha senha
+            </button>
+          </div>
+
+          <button type="submit" z-button zFull class="submit-button" [zLoading]="submitting()" [disabled]="submitting()">
+            {{ submitting() ? 'Entrando...' : 'Entrar' }}
+          </button>
+
+          <div class="auth-divider" aria-hidden="true">
+            <span></span>
+            <span> ou </span>
+            <span></span>
+          </div>
+
+          <a class="secondary-cta" routerLink="/create-account">
+            <span>Criar conta</span>
+            <ng-icon name="lucideArrowRight" class="size-4" />
+          </a>
+        </form>
+      </div>
+    </section>
+  </div>
+</section>

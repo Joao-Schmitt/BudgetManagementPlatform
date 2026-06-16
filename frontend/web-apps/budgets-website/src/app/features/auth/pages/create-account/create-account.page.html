@@ -5,62 +5,59 @@
   alternateLink="/login"
   alternateText="Fazer login"
 >
-  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-    <header>
+  <section class="auth-panel">
+    <header class="auth-panel__header">
+      <div class="auth-panel__badge" aria-hidden="true">
+        <ng-icon name="lucideUserRound" class="size-4" />
+      </div>
       <h2>Criar conta</h2>
       <p>Preencha seus dados para iniciar o onboarding.</p>
     </header>
 
-    @if (errorMessage()) {
-      <z-alert zType="destructive" [zDescription]="errorMessage() ?? ''" />
-    }
-
-    <label>
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
       <span>Nome</span>
-      <input z-input type="text" formControlName="name" placeholder="Seu nome completo" />
-      @if (hasError('name', 'required')) {
-        <small>Informe seu nome.</small>
-      }
-      @if (hasError('name', 'minlength')) {
-        <small>Use pelo menos 3 caracteres.</small>
-      }
+      <div class="field__control">
+        <span class="field__icon" aria-hidden="true">
+          <ng-icon name="lucideUserRound" class="size-4" />
+        </span>
+        <input z-input type="text" formControlName="name" placeholder="Seu nome completo" />
+      </div>
     </label>
 
-    <label>
+    <label class="field">
       <span>E-mail</span>
-      <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" />
-      @if (hasError('email', 'required')) {
-        <small>Informe o e-mail.</small>
-      }
-      @if (hasError('email', 'email')) {
-        <small>Digite um e-mail valido.</small>
-      }
+      <div class="field__control">
+        <span class="field__icon" aria-hidden="true">
+          <ng-icon name="lucideMail" class="size-4" />
+        </span>
+        <input z-input type="email" formControlName="email" placeholder="voce@empresa.com" />
+      </div>
     </label>
 
-    <label>
+    <label class="field">
       <span>Senha</span>
-      <input z-input type="password" formControlName="password" placeholder="Crie uma senha" />
-      @if (hasError('password', 'required')) {
-        <small>Informe uma senha.</small>
-      }
-      @if (hasError('password', 'minlength')) {
-        <small>Use pelo menos 6 caracteres.</small>
-      }
+      <div class="field__control">
+        <span class="field__icon" aria-hidden="true">
+          <ng-icon name="lucideLockKeyhole" class="size-4" />
+        </span>
+        <input z-input type="password" formControlName="password" placeholder="Crie uma senha" />
+      </div>
     </label>
 
-    <label>
+    <label class="field">
       <span>Confirmar senha</span>
-      <input z-input type="password" formControlName="confirmPassword" placeholder="Repita a senha" />
-      @if (hasError('confirmPassword', 'required')) {
-        <small>Confirme a senha.</small>
-      }
-      @if (passwordsDoNotMatch()) {
-        <small>As senhas devem ser iguais.</small>
-      }
+      <div class="field__control">
+        <span class="field__icon" aria-hidden="true">
+          <ng-icon name="lucideLockKeyhole" class="size-4" />
+        </span>
+        <input z-input type="password" formControlName="confirmPassword" placeholder="Repita a senha" />
+      </div>
     </label>
 
-    <button type="submit" z-button zFull [zLoading]="submitting()" [disabled]="submitting()">
-      {{ submitting() ? 'Criando conta...' : 'Criar conta' }}
-    </button>
-  </form>
+      <button type="submit" z-button zFull class="submit-button" [zLoading]="submitting()" [disabled]="submitting()">
+        {{ submitting() ? 'Criando conta...' : 'Criar conta' }}
+      </button>
+    </form>
+  </section>
 </app-auth-shell>
