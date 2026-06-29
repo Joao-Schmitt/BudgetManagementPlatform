@@ -12,15 +12,7 @@ export const HOME_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'overview'
-      },
-      {
-        path: 'overview',
-        loadComponent: () => import('./pages/overview/overview.page').then((m) => m.OverviewPage),
-        data: {
-          title: 'Inicio',
-          description: 'Visao geral do workspace e dos atalhos principais.'
-        }
+        redirectTo: 'budgets'
       },
       {
         path: 'customers',

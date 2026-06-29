@@ -209,7 +209,7 @@ namespace Budgets.Api.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
 
             if (!string.IsNullOrWhiteSpace(refreshToken))
-                _authService.InvalidateRefreshToken(refreshToken);
+                await _authService.InvalidateRefreshTokenAsync(refreshToken);
 
             await HttpContext.SignOutAsync();
 

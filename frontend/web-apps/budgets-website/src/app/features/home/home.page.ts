@@ -8,7 +8,6 @@ import {
   lucideChevronDown,
   lucideCreditCard,
   lucideFileText,
-  lucideLayoutDashboard,
   lucideLogOut,
   lucideMenu,
   lucidePackage,
@@ -33,7 +32,6 @@ import { ZardDividerComponent } from '@/shared/components/divider/divider.compon
 import { AuthStateService } from '../../core/auth/auth-state.service';
 
 type NavigationIcon =
-  | 'lucideLayoutDashboard'
   | 'lucideUsers'
   | 'lucideBuilding2'
   | 'lucideCreditCard'
@@ -67,7 +65,6 @@ interface NavigationSection {
       lucideChevronDown,
       lucideCreditCard,
       lucideFileText,
-      lucideLayoutDashboard,
       lucideLogOut,
       lucideMenu,
       lucidePackage,
@@ -84,8 +81,8 @@ export class HomePage {
   protected readonly authState = inject(AuthStateService);
   protected readonly drawerOpen = signal(false);
   protected readonly userMenuOpen = signal(false);
-  private readonly routeTitleSignal = signal('Inicio');
-  private readonly routeDescriptionSignal = signal('Visao geral dos indicadores e atalhos do workspace.');
+  private readonly routeTitleSignal = signal('Orcamentos');
+  private readonly routeDescriptionSignal = signal('Crie, edite, visualize, baixe e envie os orcamentos da operacao.');
 
   protected readonly navigationSections: NavigationSection[] = [
     {
@@ -153,9 +150,10 @@ export class HomePage {
     const activeRouteSnapshot = this.findDeepestRouteSnapshot(this.router.routerState.snapshot.root);
     const routeData = activeRouteSnapshot?.routeConfig?.data ?? activeRouteSnapshot?.data ?? {};
 
-    this.routeTitleSignal.set((routeData['title'] as string | undefined) ?? 'Inicio');
+    this.routeTitleSignal.set((routeData['title'] as string | undefined) ?? 'Orcamentos');
     this.routeDescriptionSignal.set(
-      (routeData['description'] as string | undefined) ?? 'Visao geral dos indicadores e atalhos do workspace.'
+      (routeData['description'] as string | undefined) ??
+        'Crie, edite, visualize, baixe e envie os orcamentos da operacao.'
     );
   }
 

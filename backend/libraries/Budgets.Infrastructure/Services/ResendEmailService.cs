@@ -41,7 +41,7 @@ namespace Budgets.Infrastructure.Services
             message.To.Add(email.Destinatario);
             message.Attachments = new List<EmailAttachment>();
 
-            foreach (var anexo in _filaEmailAnexoRepository.GetAll(x => x.FilaEmailId == email.Id)
+            foreach (var anexo in _filaEmailAnexoRepository.GetAll(x => x.FilaEmailId == email.Id, readOnly: true)
                                                            .ToList())
             {
                 message?.Attachments?.Add(new EmailAttachment

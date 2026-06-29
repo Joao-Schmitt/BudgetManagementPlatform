@@ -5,6 +5,6 @@ namespace Budgets.Domain.User.Interfaces
 {
     public interface IUsuarioRefreshTokenRepository : IRepository<UsuarioRefreshToken>
     {
-        UsuarioRefreshToken GetByToken(string token);
+        Task<UsuarioRefreshToken?> GetByTokenAsync(string token);
     }
 }

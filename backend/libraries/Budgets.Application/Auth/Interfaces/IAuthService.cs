@@ -16,6 +16,6 @@ namespace Budgets.Application.Auth.Interfaces
         Task<Result> DisableTwoFactorAsync(Guid userId, string code);
         Result SaveUserRefreshToken(Guid userId, string refreshTokenHash);
         Task<Result<Usuario>> GetUserByRefreshTokenAsync(string refreshToken);
-        Result InvalidateRefreshToken(string refreshToken);
+        Task<Result> InvalidateRefreshTokenAsync(string refreshToken);
     }
 }

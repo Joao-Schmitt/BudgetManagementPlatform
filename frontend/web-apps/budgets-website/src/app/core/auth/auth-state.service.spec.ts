@@ -39,7 +39,7 @@ describe('AuthStateService', () => {
 
     expect(service.isAuthenticated()).toBeTrue();
     expect(service.currentUser()).toEqual({ id: '1', name: 'Ana', email: 'ana@empresa.com' });
-    expect(router.navigate).toHaveBeenCalledWith(['/home/overview']);
+    expect(router.navigate).toHaveBeenCalledWith(['/home/budgets']);
   });
 
   it('should route to the two-factor step when required', () => {

@@ -46,7 +46,7 @@ namespace Budgets.Infrastructure.IoC
     {
         public static IServiceCollection AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<BudgetsDbContext>(options =>
+            services.AddDbContextPool<BudgetsDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

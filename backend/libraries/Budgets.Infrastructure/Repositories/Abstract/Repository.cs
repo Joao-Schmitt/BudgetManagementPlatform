@@ -30,6 +30,16 @@ namespace Budgets.Infrastructure.Repositories.Abstract
             return await _db.Where(predicate).ToListAsync();
         }
 
+        public virtual TEntity? FirstOrDefault(Expression<Func<TEntity, bool>> predicate, bool readOnly = false)
+        {
+            var query = _db.Where(predicate);
+
+            if (readOnly)
+                query = query.AsNoTracking();
+
+            return query.FirstOrDefault();
+        }
+
         public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool readOnly = false)
         {
             var query = _db.Where(predicate);

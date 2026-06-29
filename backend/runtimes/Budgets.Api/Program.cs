@@ -1,10 +1,11 @@
+using Budgets.Api.BackgroundServices;
 using Budgets.Api.Extensions;
 using Budgets.Api.Handlers;
 using Budgets.Api.Security;
 using Budgets.Infrastructure.IoC;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.ResponseCompression;
 using Resend;
+using System.IO.Compression;
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 
@@ -56,8 +57,30 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+    [
+        "application/json"
+    ]);
+});
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
 builder.Services.AddDependencyInjection(builder.Configuration);
-builder.Services.AddEmailQueueProcessing();
 
 builder.Services.AddOptions();
 
@@ -66,7 +89,21 @@ builder.Services.AddResend(options =>
     options.ApiToken = builder.Configuration["Email:ApiToken"]!;
 });
 
+builder.Services.AddHostedService<EmailBackgroundService>();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
+
+app.UseHttpsRedirection();
+
+app.UseResponseCompression();
+
+app.UseCors("DefaultCors");
+
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Map("/health", health =>
 {
@@ -88,16 +125,5 @@ app.Map("/session", (ClaimsPrincipal user) =>
     });
 })
 .RequireAuthorization();
-
-
-app.UseExceptionHandler();
-
-app.UseHttpsRedirection();
-
-app.UseCors("DefaultCors");
-
-app.UseAuthorization();
-
-app.MapControllers();
 
 app.Run();

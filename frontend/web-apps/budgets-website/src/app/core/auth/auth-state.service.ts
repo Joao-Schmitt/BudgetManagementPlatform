@@ -254,6 +254,6 @@ export class AuthStateService {
   }
 
   private navigateToHome(): Promise<boolean> {
-    return this.router.navigate(['/home/overview']);
+    return this.router.navigate(['/home/budgets']);
   }
 }

@@ -131,18 +131,7 @@ namespace Budgets.Application.Email.Services
 
         private async Task<List<FilaEmail>> GetPending()
         {
-            var pendentes = _filaEmailRepository.GetAll(x => x.Situacao == FilaEmailSituacao.Pendente)
-                                                 .ToList();
-
-            pendentes.ForEach(x =>
-            {
-                x.Situacao = FilaEmailSituacao.Enviando;
-                _filaEmailRepository.Update(x);
-            });
-
-            await _uow.CommitAsync();
-
-            return pendentes;
+            return await _filaEmailRepository.AtualizaSituacaoAsync(x => x.Situacao == FilaEmailSituacao.Pendente, FilaEmailSituacao.Enviando);
         }
 
         private async Task UpdateSituacaoAsync(Guid id, UpdateFilaEmailSituacaoArgs args)

@@ -227,7 +227,7 @@ namespace Budgets.Application.Auth.Services
 
         public async Task<Result<Usuario>> GetUserByRefreshTokenAsync(string refreshToken)
         {
-            var savedToken = _usuarioRefreshTokenRepository.GetByToken(refreshToken);
+            var savedToken = await _usuarioRefreshTokenRepository.GetByTokenAsync(refreshToken);
 
             if (savedToken == null || !savedToken.IsActive)
                 return Result<Usuario>.Fail("Token inválido ou expirado.");
@@ -246,9 +246,9 @@ namespace Budgets.Application.Auth.Services
             return Result<Usuario>.Ok(user); 
         }
 
-        public Result InvalidateRefreshToken(string refreshToken)
+        public async Task<Result> InvalidateRefreshTokenAsync(string refreshToken)
         {
-            var savedToken = _usuarioRefreshTokenRepository.GetByToken(refreshToken);
+            var savedToken = await _usuarioRefreshTokenRepository.GetByTokenAsync(refreshToken);
 
             if (savedToken == null || !savedToken.IsActive)
                 return Result.Ok();
